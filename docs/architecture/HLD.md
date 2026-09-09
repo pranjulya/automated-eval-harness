@@ -115,7 +115,9 @@ stateDiagram-v2
     Passed --> [*]
 ```
 
-`Invalid` and `Incomplete` are run statuses, not quality decisions; their CLI exits prevent deployment. Only a comparable completed run can produce `PASS`, `BLOCK`, or `REVIEW_REQUIRED`.
+`Invalid` and `Incomplete` are run statuses, not quality decisions; their CLI exits prevent deployment (`4` invalid input, `5` infrastructure, `130` interrupted). Only a comparable completed run can produce `PASS`, `BLOCK`, or `REVIEW_REQUIRED`.
+
+A completed run may still contain case-level `ERROR` (invocation failed after bounded retries). Those cases remain in the 50-case denominator and cannot satisfy floors. Suite/config failure never produces case scores. A per-case `INVALID` after a successful load is an internal defect and makes the run non-comparable.
 
 ## 6. Deployment topology
 

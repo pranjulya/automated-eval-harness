@@ -33,14 +33,14 @@ Read evaluation strategy §11, HLD security boundaries, PRD FR-21/22. Learn trus
 - [ ] Resolve baseline only from the protected base branch/trusted store and prove candidate changes cannot replace it.
 - [ ] Run deterministic/unit/contract tests on every PR; run complete approved 50-case configuration on release-capable changes with explicit secrets/budget.
 - [ ] Upload complete safe artifacts on pass/block/review/failure with retention and checksum verification.
-- [ ] Implement waiver schema requiring owner, approver, exact scope/reasons, compensating control, and expiry `<=14 days`.
-- [ ] Reject expired, mismatched, overbroad, unsigned/unapproved, or hard-invariant waivers; display accepted waivers in reports/attestations.
+- [ ] Implement waiver schema requiring owner, GitHub approver identity, exact scope/reasons, compensating control, and expiry `<=14 days`. V1 approval evidence is a protected GitHub review (required reviewers / CODEOWNERS on the waiver path), not an application cryptographic signature.
+- [ ] Reject expired, mismatched, overbroad, missing GitHub approval evidence, or hard-invariant waivers; display accepted waivers in reports/attestations.
 - [ ] Add protected promotion workflow separate from candidate execution credentials.
 - [ ] Document rerun, flaky-provider, budget-exhaustion, artifact-retention, and emergency release procedures.
 
 ## Tests and failure scenarios
 
-Candidate edits baseline/workflow, fork PR lacks secrets, replay artifact reused for wrong commit, job skipped, artifact upload fails, provider budget exhausted, rerun differs, waiver expires mid-run, wildcard case scope, hard failure waiver, forged approval, and deploy manually invoked without attestation.
+Candidate edits baseline/workflow, fork PR lacks secrets, replay artifact reused for wrong commit, job skipped, artifact upload fails, provider budget exhausted, rerun differs, waiver expires mid-run, wildcard case scope, hard failure waiver, waiver without protected GitHub approval, and deploy manually invoked without attestation.
 
 ## Verification
 

@@ -19,7 +19,7 @@ Read dataset design §4, evaluation strategy §3, HLD §7, LLD §§3/6–7. Lear
 - Complete first-party evaluators/models/report projections for structured, RAG, and tool profiles.
 - Create profile E2E fixtures and tests for all 32 complex-profile goldens (`10+12+10`).
 - Create adapter compatibility fixtures for evidence/citation/tool trace normalization.
-- Modify API filters/reports/docs and add `Learning/concepts/10-extension-profiles.md`.
+- Modify API filters/reports/docs and update `Learning/concepts/10-extension-profiles.md`.
 
 ## Interfaces produced
 

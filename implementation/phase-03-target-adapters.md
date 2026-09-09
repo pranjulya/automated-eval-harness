@@ -8,7 +8,7 @@ Implement a deterministic fake target and generic HTTP target adapter that produ
 
 ## Prerequisites and decisions
 
-Phase 01 `COMPLETE`; target request/response mapping and approved egress/secret rules documented; no provider-specific SDK is required.
+Phases 01 and 02 `COMPLETE`; the Phase 02 `NormalizedOutcome` contract is frozen; target request/response mapping and approved egress/secret rules documented; no provider-specific SDK is required.
 
 ## References and concepts
 

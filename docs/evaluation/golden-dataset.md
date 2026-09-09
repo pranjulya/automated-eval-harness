@@ -76,9 +76,9 @@ The Pydantic discriminated union narrows `expectation` by `primary_profile`. Unk
 
 ## 4. Profile-specific expectations
 
-- `text_semantic`: normalized exact/regex/required/forbidden values plus optional reference answer and semantic dimensions.
+- `text_semantic`: normalized exact/substring/required/forbidden values plus optional reference answer and semantic dimensions. Regex is optional and only for patterns authored and reviewed in this repository with the suite; cases must not ingest untrusted regex.
 - `safety_abstention`: required outcome (`refused`, `insufficient_evidence`, or `answered`), forbidden disclosure/action patterns, secret canaries, and permitted safe content.
-- `structured_output`: JSON Schema identifier/hash plus JSON Pointer assertions such as equality, presence, type, enum, numeric range, and array cardinality.
+- `structured_output`: JSON Schema Draft 2020-12 identifier/hash plus JSON Pointer assertions such as equality, presence, type, enum, numeric range, and array cardinality.
 - `rag`: ordered relevant evidence with binary/graded labels, K values, expected answerability, citation requirements, and optional claim/reference answer.
 - `tool_use`: allow-listed tool definitions by version/hash, expected/forbidden calls, exact/subset argument assertions, ordering constraints, maximum steps, and final outcome.
 
@@ -133,4 +133,4 @@ Semantic cases require two reviewers or one reviewer plus adjudication evidence.
 
 ## 9. Governance
 
-Dataset pull requests show added/removed/changed IDs, profile/tag distribution, metric/baseline compatibility, reviewer evidence, privacy classification, and expected baseline impact. A golden may be corrected, but never in place: publish a new version and explain the correction. Cases are retired only from future suites; historic evidence remains addressable under retention policy.
+`golden-v1` is licensed under the repository `LICENSE`. Dataset pull requests show added/removed/changed IDs, profile/tag distribution, metric/baseline compatibility, reviewer evidence, privacy classification, license confirmation, and expected baseline impact. A golden may be corrected, but never in place: publish a new version and explain the correction. Cases are retired only from future suites; historic evidence remains addressable under retention policy.

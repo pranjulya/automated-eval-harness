@@ -44,7 +44,7 @@ Deterministic checks run first because they are cheap, inspectable, and stable.
 
 ### Text and safety
 
-- Unicode normalization, whitespace/case policy, exact/substring/regular-expression matches.
+- Unicode normalization, whitespace/case policy, exact and substring matches. Regular-expression matches are allowed only for trusted, repository-authored patterns in the golden suite; never from target output, fixtures fetched at runtime, or operator-supplied untrusted input. Python `re` has no timeout; V1 does not claim one and does not compile arbitrary regex.
 - Required and forbidden values/concepts only when labels can be expressed without semantic guesswork.
 - Required outcome: answered, refused, insufficient evidence, or error.
 - Canary and prohibited-action checks.
@@ -52,14 +52,14 @@ Deterministic checks run first because they are cheap, inspectable, and stable.
 ### Structured output
 
 - JSON parsing and no trailing prose where the contract forbids it.
-- JSON Schema/Pydantic-compatible schema validation.
+- JSON Schema Draft 2020-12 validation via the `jsonschema` library in the structured evaluator (not in domain code). Extra fields are rejected when the referenced schema says so.
 - JSON Pointer assertions for values, types, presence, enums, ranges, and collection length.
 - Unexpected fields rejected according to the referenced schema.
 
 ### RAG
 
 - `Recall@K = retrieved relevant identities / total relevant identities` after collapsing duplicates by stable evidence identity.
-- `Precision@K = relevant identities in top K / K` with documented behavior when fewer than K are returned.
+- `Precision@K = relevant identities in top K / K`. Fewer than K results still divide by K (short lists are penalized). Zero returned for an answerable case yields `0.0`. No-answer cases do not use Precision@K.
 - `MRR = 1 / rank of first relevant identity`, or zero when absent.
 - `nDCG@K` only for cases with graded relevance; use the standard logarithmic discount and ideal ranking from the same labels.
 - Context evidence recall after truncation.
@@ -110,7 +110,14 @@ Each case returns:
 - `ERROR` when invocation/evaluation cannot complete;
 - `REVIEW_REQUIRED` when evidence is unavailable, uncalibrated, or statistically inconclusive under policy.
 
-The headline `case_pass_rate` is passing cases divided by the 50 valid expected cases. `INVALID` or `ERROR` never disappears from the denominator; a non-comparable run cannot pass. V1 case weights are all one. Reports also aggregate by primary profile, tag, failure class, evaluator, and operational dimension.
+The headline `case_pass_rate` is passing cases divided by the 50 expected cases of a completed comparable run. V1 case weights are all one. Reports also aggregate by primary profile, tag, failure class, evaluator, and operational dimension.
+
+Distinguish case state from run status:
+
+- Suite, config, or hash failure aborts before scoring (`DATASET_INVALID` / `CONFIG_INVALID`). Run status is `Invalid`; CLI exit `4`; no quality decision.
+- Missing expected cases, process kill before finalize, or a corrupt/partial bundle makes the run `Incomplete`. Exit `4` (coverage/integrity), `5` (infrastructure), or `130` (SIGINT). No `PASS`, `BLOCK`, or `REVIEW_REQUIRED`.
+- After bounded retries, timeout, rate-limit, or malformed outcome on a case is case state `ERROR`. The run remains completed and comparable; `ERROR` stays in the denominator and cannot satisfy floors.
+- After a successful load, per-case `INVALID` is an internal defect: the run is non-comparable and exits `5`.
 
 ## 6. Baseline lifecycle
 
@@ -213,7 +220,7 @@ flowchart LR
 - CI uploads artifacts regardless of decision where safe.
 - Deploy jobs depend on the exact comparison job and verified run hash.
 - Candidate code cannot write baseline storage.
-- A waiver is signed/approved, scoped to reason/cases/config, expires within 14 days, names an owner, and cannot cover a hard invariant.
+- A waiver is approved with protected GitHub identity evidence in V1 (required reviewers / CODEOWNERS on the waiver path, GitHub actor recorded on the waiver record), scoped to reason/cases/config, expires within 14 days, names an owner, and cannot cover a hard invariant. Cryptographic application signatures wait until Phase 08 selects an identity provider.
 
 ## 12. Failure taxonomy
 

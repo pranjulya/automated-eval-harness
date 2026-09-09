@@ -8,11 +8,11 @@
 | ADR-001 | Runtime and packaging | Python 3.12+, `src/` package, Pydantic v2, pytest/Ruff/mypy | polyglot runtime; framework-heavy scaffold | 00 |
 | ADR-002 | User entry point | standard-library `argparse` CLI is authoritative; FastAPI later wraps services | Typer/Click dependency; API-first; notebook authority | 00 |
 | ADR-003 | Golden data/versioning | strict JSONL cases + JSON manifest/checksums, SHA-256 identity, immutable versions | mutable spreadsheets; executable YAML/templates; database-only labels | 01 |
-| ADR-004 | Scoring model | deterministic hard/contract/profile evaluators first; explicit profile registry | one opaque composite score; judge-only evaluation | 02 |
+| ADR-004 | Scoring model | deterministic hard/contract/profile evaluators first; explicit profile registry; `jsonschema` Draft 2020-12 in the structured evaluator | one opaque composite score; judge-only evaluation; ad-hoc JSON parsers | 02 |
 | ADR-005 | Persistence/experiments | immutable run bundles on filesystem/object store; no SQL or hosted tracker required | PostgreSQL/MLflow from day one | 04 |
 | ADR-006 | Semantic judging | rubric-specific, structured, calibrated judge with human agreement thresholds | “is this good?” judge; majority of uncalibrated judges | 05 |
 | ADR-007 | Regression policy | absolute floors + paired case non-regression + paired bootstrap non-inferiority; `REVIEW_REQUIRED` blocks deploy | aggregate-only threshold; p-value-only decision | 06 |
-| ADR-008 | CI and waivers | trusted base-branch baseline, stable exit codes, immutable artifacts, scoped expiring waiver; hard invariants non-waivable | candidate-owned baseline; permanent ignore list | 07 |
+| ADR-008 | CI and waivers | trusted base-branch baseline, stable exit codes, immutable artifacts, scoped expiring waiver with protected GitHub approval evidence; hard invariants non-waivable | candidate-owned baseline; permanent ignore list; app signatures before an IdP exists | 07 |
 | ADR-009 | HTTP/service scope | read-mostly FastAPI wrapper and protected promotions; platform job runner if needed | custom distributed queue/dashboard SPA | 08 |
 | ADR-010 | Online evaluation/privacy | opt-in sampling, redact before persist, quarantine, human promotion only | ingest all traces; auto-golden/auto-baseline | 08 |
 | ADR-011 | Extension boundary | first-party discriminated profiles reuse one runner/result/gate lifecycle | dynamic plugin marketplace; profile-specific runners | 09 |

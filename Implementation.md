@@ -5,9 +5,9 @@
 **Status:** PLANNING_COMPLETE — all implementation phases `NOT_STARTED`; awaiting user approval  
 **Goal:** Build a reproducible, provider-neutral GenAI evaluation harness that scores 50 golden cases, explains failures by capability, and prevents quality regressions from reaching deployment.  
 **Architecture:** A shared Python evaluation core loads immutable dataset/config artifacts, invokes a system under test through a typed adapter, applies deterministic evaluators before optional calibrated judges, writes an immutable run bundle, and compares it with a reviewed baseline. The CLI is authoritative; CI and a later thin authenticated HTTP API call the same services.  
-**Tech stack:** Python 3.12+, standard-library `argparse`, Pydantic v2, HTTPX, pytest, Ruff, mypy, FastAPI for the optional service surface, OpenTelemetry, Docker, GitHub Actions. Exact supported versions are locked in Phase 00 after then-current verification.  
+**Tech stack:** Python 3.12+, standard-library `argparse`, Pydantic v2, HTTPX, pytest, Ruff, mypy, `jsonschema` (Draft 2020-12 structured-output validation in Phase 02 evaluators), FastAPI for the optional service surface, OpenTelemetry, Docker, GitHub Actions. Exact supported versions are locked in Phase 00 after then-current verification. `jsonschema` is added and justified in Phase 02, not Phase 00.  
 **Specs:** `docs/product/PRD.md`, `docs/evaluation/*.md`, `docs/architecture/*.md`, `docs/operations/failure-triage.md`.  
-**Open planning review:** `docs/architecture/planning-gap-analysis.md` lists contradictions and spec gaps to resolve before implementation. It is not an ADR and does not authorize application code.
+**Open planning review:** `docs/architecture/planning-gap-analysis.md` records contradictions and spec gaps. Key locks from independent review were applied 2026-09-10. It is not an ADR and does not authorize application code.
 
 ## 1. Problem definition
 
@@ -120,6 +120,7 @@ V1 uses immutable run bundles and a generated comparison report. A run never bec
 Project-07-Automated-Eval-Harness/
   AGENTS.md
   CLAUDE.md
+  LICENSE
   README.md
   Implementation.md
   docs/
@@ -152,7 +153,7 @@ Project-07-Automated-Eval-Harness/
 | 00 | Repository, contracts, CLI shell, quality tooling | User approval, ADR-001/002 | NOT_STARTED |
 | 01 | Golden dataset schema, validation, immutable versioning, 50-case seed | 00, ADR-003 | NOT_STARTED |
 | 02 | Deterministic evaluators and metric library | 01, ADR-004 | NOT_STARTED |
-| 03 | Target adapters, normalized attempts, deterministic fake target | 01 | NOT_STARTED |
+| 03 | Target adapters, normalized attempts, deterministic fake target | 01, 02 | NOT_STARTED |
 | 04 | Evaluation runner, run bundles, reports, experiment comparison | 02, 03, ADR-005 | NOT_STARTED |
 | 05 | LLM-as-judge rubrics, calibration, reliability controls | 04, ADR-006 | NOT_STARTED |
 | 06 | Baseline promotion, regression engine, statistics, thresholds | 04, 05, ADR-007 | NOT_STARTED |
@@ -167,7 +168,7 @@ Project-07-Automated-Eval-Harness/
 flowchart TD
     P00[00 Foundation] --> P01[01 Golden dataset]
     P01 --> P02[02 Deterministic evaluators]
-    P01 --> P03[03 Target adapters]
+    P02 --> P03[03 Target adapters]
     P02 --> P04[04 Runner and artifacts]
     P03 --> P04
     P04 --> P05[05 Judge calibration]

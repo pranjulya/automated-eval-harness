@@ -1,9 +1,9 @@
 # Planning Gap Analysis — Pre-Implementation Findings
 
-**Status:** OPEN_FOR_REVIEW — not accepted; not an ADR; not authorization to write application code  
-**Date:** 2026-09-09  
+**Status:** KEY_LOCKS_APPLIED — independent review accepted the items in §11; owning docs patched 2026-09-10. Still not an ADR and not authorization to write application code.  
+**Date:** 2026-09-09 (locks applied 2026-09-10)  
 **Author:** Grok planning audit  
-**Audience:** Independent reviewer (including Codex). Review this file against the planning package and accept, revise, or reject each item before Phase 00.
+**Audience:** Independent reviewer (including Codex). Remaining open gaps in §2 still need later-phase locks. Do not start application code from this list.
 
 This document captures a consolidated audit of the current repository. It is a review artifact, not a product-rule change. Authoritative documents remain `docs/product/PRD.md`, `docs/evaluation/evaluation-strategy.md`, `docs/evaluation/golden-dataset.md`, `docs/architecture/HLD.md`, `docs/architecture/LLD.md`, and accepted ADRs. When this file conflicts with those documents, **do not implement from this file**; repair the owning document first.
 
@@ -29,7 +29,7 @@ Record findings as accept / revise / reject per numbered item. Do not start appl
 | Learning | 10 concepts, 5 scenarios, interview Q&A | Outline-level |
 | Application code | None | Correct until user approval |
 | Dataset / configs / rubrics / baselines | None | Phase 01+ |
-| Git | Not a git repository | Blocking for run provenance (`git SHA`, dirty flag) |
+| Git | `origin/main` at GitHub `pranjulya/automated-eval-harness` | Present; dirty-flag provenance still requires a clean Phase 00 CLI |
 
 Architecture review result remains `READY_FOR_USER_REVIEW; NOT APPROVED_FOR_IMPLEMENTATION`. This file does not change that.
 
@@ -43,37 +43,37 @@ These will produce conflicting implementations if left as-is. Precedence is PRD 
 
 - **Strategy** (`docs/evaluation/evaluation-strategy.md` §3): `Precision@K = relevant identities in top K / K`, with documented behavior when fewer than K are returned.
 - **LLD** (`docs/architecture/LLD.md` §7): denominator is actual returned count capped at K; zero returned yields `0.0` for an answerable case.
-- **Proposed lock:** Keep denominator **K** (standard IR; short lists are penalized). Empty retrieval for an answerable case scores `0.0`. No-answer cases do not use Precision@K.
-- **Owning doc to patch:** evaluation strategy (keep formula) and LLD (align §7).
+- **Lock (accepted):** Keep denominator **K** (standard IR; short lists are penalized). Empty retrieval for an answerable case scores `0.0`. No-answer cases do not use Precision@K.
+- **Applied:** evaluation strategy §3 and LLD §7 now match.
 
 ### C-02 — Exit code 130
 
 - **PRD FR-13:** `0 PASS`, `2 BLOCK`, `3 REVIEW_REQUIRED`, `4 invalid/non-comparable`, `5 infrastructure/internal failure`.
 - **LLD §11 and Phase 00:** also `130 interrupted`.
-- **Proposed lock:** Add `130` to PRD FR-13 as the interrupted/SIGINT mapping. Keep `5` for internal/infrastructure failure after the process is still able to emit a result.
-- **Owning doc to patch:** PRD.
+- **Lock (accepted):** Add `130` to PRD FR-13 as the interrupted/SIGINT mapping. Keep `5` for internal/infrastructure failure after the process is still able to emit a result.
+- **Applied:** PRD FR-13, LLD §11, HLD §5.
 
 ### C-03 — Case `ERROR` versus run comparability
 
 - **Strategy §5:** `INVALID`/`ERROR` stay in the 50-case denominator; a non-comparable run cannot pass.
 - **HLD §5:** `Invalid` and `Incomplete` are run statuses, not quality decisions. Only a comparable completed run can be `PASS` / `BLOCK` / `REVIEW_REQUIRED`.
-- **Proposed lock:**
+- **Lock (accepted):**
   - Target timeout/rate-limit after bounded retries → case `ERROR`, run **completed**, quality decision allowed, floors apply (`ERROR` counts against pass rate).
-  - Missing expected cases, process kill before finalize, corrupt/partial bundle → run **Incomplete**, exit `4` or `5`, no `PASS`/`BLOCK`/`REVIEW_REQUIRED`.
-- **Owning docs to patch:** evaluation strategy §5 and HLD §5 (same wording).
+  - Missing expected cases, process kill before finalize, corrupt/partial bundle → run **Incomplete**, exit `4` or `5` or `130`, no `PASS`/`BLOCK`/`REVIEW_REQUIRED`.
+- **Applied:** evaluation strategy §5, HLD §5, LLD case-pass section.
 
 ### C-04 — “50 valid expected cases” versus case `INVALID`
 
 - **Strategy §5** uses “passing cases divided by the 50 valid expected cases” and also says `INVALID` never leaves the denominator.
-- **Proposed lock:** Suite/config/schema failure aborts before scoring (`DATASET_INVALID` / `CONFIG_INVALID`, exit `4`). After a successful load, a per-case `INVALID` should be unreachable; if it occurs it is an internal defect (`5`) and the run is non-comparable.
-- **Owning doc to patch:** evaluation strategy §5.
+- **Lock (accepted):** Suite/config/schema failure aborts before scoring (`DATASET_INVALID` / `CONFIG_INVALID`, exit `4`). After a successful load, a per-case `INVALID` should be unreachable; if it occurs it is an internal defect (`5`) and the run is non-comparable.
+- **Applied:** evaluation strategy §5, HLD §5, LLD.
 
 ### C-05 — Baseline signature versus hash
 
 - **PRD / threat model:** signature or hash verification.
 - **LLD `BaselineRecord`:** optional signature.
-- **Proposed lock:** V1 identity is SHA-256 hash plus trusted base-branch/store resolution. Cryptographic signatures are optional in Phase 07/08 if an identity provider exists. Do not require signatures for local/CLI mode.
-- **Owning docs to patch:** PRD security wording and LLD `BaselineRecord`.
+- **Lock (revised with G-27):** V1 identity is SHA-256 hash plus trusted base-branch/store resolution. Phase 07 waiver/promotion approval uses protected GitHub evidence. Cryptographic application signatures wait until Phase 08 selects an identity provider. Do not require signatures for local/CLI mode.
+- **Applied for waivers:** evaluation strategy §11, Phase 07, LLD CLI note. Baseline-record optional-signature wording can wait for ADR-008 acceptance.
 
 ### C-06 — Compare during `run` versus separate `compare`
 
@@ -86,8 +86,14 @@ These will produce conflicting implementations if left as-is. Precedence is PRD 
 ### C-07 — Learning files “create” versus “update”
 
 - Phase 09 says add `Learning/concepts/10-extension-profiles.md`; the file already exists.
-- **Proposed lock:** Later phases **update** existing Learning files. Do not create duplicates.
-- **Owning docs to patch:** phase files 01–10 “Files” sections.
+- **Lock (accepted):** Later phases **update** existing Learning files. Do not create duplicates.
+- **Applied:** Phase 09 Files section.
+
+### C-08 — Phase 03 depends on `NormalizedOutcome` from Phase 02
+
+- **Review finding:** Phase 03 currently depended only on Phase 01, but adapters must emit the Phase 02 `NormalizedOutcome` contract.
+- **Lock (accepted):** Phase 03 depends on Phases 01 and 02.
+- **Applied:** `Implementation.md` roadmap table and dependency diagram; Phase 03 prerequisites.
 
 ---
 
@@ -105,10 +111,10 @@ Close each gap in the owning document **before the named phase**, not by improvi
 | G-04 | Hard-invariant → case IDs | Every V1 hard invariant except integrity/baseline-substitution has at least one golden | `golden-dataset.md` |
 | G-05 | Canonical hashing | UTF-8, LF, canonical JSON object key sort, SHA-256; suite hash over sorted `(relative_path, sha256)` excluding `checksums.json` itself | `golden-dataset.md` |
 | G-06 | Unicode / whitespace policy | NFC; trim; collapse internal whitespace for normalized match; exact match remains raw | evaluation strategy §3 |
-| G-07 | Regex policy | Python `re` with timeout/size limit; no `IGNORECASE` unless the case sets it; reject catastrophic patterns by length/complexity limits | evaluation strategy §3 |
-| G-08 | JSON Schema dialect | Draft 2020-12; extra fields rejected when the referenced schema says so | `golden-dataset.md` + strategy |
+| G-07 | Regex policy | **Rejected as written** (`re` has no timeout). V1 allows only trusted repository-authored patterns in the golden suite; never compile target output or untrusted input; do not claim a timeout | evaluation strategy §3; applied |
+| G-08 | JSON Schema dialect | Draft 2020-12 via `jsonschema` added in Phase 02; extra fields rejected when the referenced schema says so; domain stays free of the library | Phase 02 + strategy; applied |
 | G-09 | Privacy classification enum | `synthetic-public` for `golden-v1` | `golden-dataset.md` |
-| G-10 | Fixture license | Same as repository license; state in `REVIEW.md` | Phase 01 `REVIEW.md` |
+| G-10 | Fixture license | Same as repository MIT `LICENSE`; restate in Phase 01 `REVIEW.md` | `LICENSE` added; `REVIEW.md` still Phase 01 |
 | G-11 | Dataset owners / reviewers | Named roles even if placeholder identities | Phase 01 prerequisite |
 | G-12 | Intended V1 targets | Fake adapter + local HTTP contract server; live providers opt-in | `golden-dataset.md` manifest |
 
@@ -135,7 +141,7 @@ Close each gap in the owning document **before the named phase**, not by improvi
 | G-24 | Config JSON examples | One invalid-as-example file per required section: target, invocation, evaluators, judge, gate, artifacts, observability, privacy | 00/04 |
 | G-25 | Secret-reference syntax | Environment variable names only in config (`api_key_env: "TARGET_API_KEY"`); never inline secrets | 00 |
 | G-26 | Auth roles | `reader`, `runner`, `quality_owner`, `security_admin` | 08 |
-| G-27 | Waiver approval | `--approval-file` is a signed/issued JSON record with owner, approver identity, scope, expiry ≤14 days; no wildcard case scope | 07 |
+| G-27 | Waiver approval | Protected GitHub approval evidence in Phase 07 (required reviewers / CODEOWNERS, GitHub actor on the waiver record). Cryptographic application signatures wait for Phase 08 IdP. No wildcard case scope; expiry ≤14 days | 07; applied |
 | G-28 | Retention classes | `run-standard`, `online-short`, `quarantine-restricted` with TTLs chosen in Phase 08 | 08 |
 | G-29 | Redaction catalog | Strip provider tokens, `Authorization` headers, secret canaries, and classified online payloads from logs, reports, and judge prompts | 03/08 |
 | G-30 | Object-store / IdP product | Still postponed to Phase 08; LLD should name the **port** and env vars only | 08 |
@@ -270,13 +276,13 @@ Integrity-hash failure and candidate baseline substitution are **run/CI** invari
 
 ### Add before Phase 00 starts
 
-| Item | Why |
-|---|---|
-| Git repository on `main` | Run provenance requires git SHA and dirty flag |
-| `.gitignore` | Keep staging artifacts, `.env`, `__pycache__`, and session logs out |
-| `LICENSE` | Code and synthetic dataset |
-| Accepted `ADR-001` and `ADR-002` | Required before Phase 00 |
-| ADR template | Date, owner, context, decision, consequences, superseded-by |
+| Item | Why | Status |
+|---|---|---|
+| Git repository on `main` | Run provenance requires git SHA and dirty flag | Done (`origin/main`) |
+| `.gitignore` | Keep staging artifacts, `.env`, `__pycache__`, and session logs out | Done (tmux logs ignored) |
+| `LICENSE` | Code and synthetic dataset | Done (MIT; `golden-v1` uses the same license) |
+| Accepted `ADR-001` and `ADR-002` | Required before Phase 00 | Still required |
+| ADR template | Date, owner, context, decision, consequences, superseded-by | Still open |
 
 ### Phase 00 already specifies (do not invent extra product)
 
@@ -294,7 +300,7 @@ Integrity-hash failure and candidate baseline substitution are **run/CI** invari
 
 ### Remove
 
-`tmux-client-14112.log` — local session junk, not a product file.
+`tmux-client-14112.log` — removed in `ad9512a` and ignored.
 
 ### Name consistency
 
@@ -347,18 +353,18 @@ These remain PRD non-goals. Reject review comments that introduce them.
 
 ---
 
-## 9. Recommended planning-only next pass
+## 9. Remaining planning-only work
 
-No application code. If this review is accepted, patch the owning documents in this order:
+Applied 2026-09-10: C-01, C-02, C-03, C-04, C-07, C-08, G-07 (rejected/replaced), G-08, G-27, LICENSE, git/gitignore/tmux cleanup.
 
-1. Resolve C-01 through C-07 in PRD / strategy / HLD / LLD / phase files.
-2. Add the 50-case map, tag vocabulary, and hard-invariant case IDs to `golden-dataset.md`.
-3. Add the gate reason-code catalog beside the failure taxonomy.
-4. Lock nDCG, p95, cost, kappa weights, bootstrap LCB, Unicode, regex, JSON Schema draft, and hashing.
-5. Add example config / rubric / gate-policy JSON (may be marked illustrative).
-6. Accept or revise ADR-001 and ADR-002 as dated records.
-7. Initialize git, add `LICENSE` and `.gitignore`, delete `tmux-client-14112.log`.
-8. Leave ADR-003–012 as candidates until their phases.
+Still open before or during later phases (no application code yet):
+
+1. Add the 50-case map, tag vocabulary, and hard-invariant case IDs to `golden-dataset.md` (G-01–G-04) before Phase 01.
+2. Add the gate reason-code catalog beside the failure taxonomy (G-18) before Phase 06.
+3. Lock nDCG, p95, cost, kappa weights, bootstrap LCB, Unicode, and hashing (G-05, G-06, G-13–G-17) in their owning phases.
+4. Add example config / rubric / gate-policy JSON (G-24).
+5. Accept or revise ADR-001 and ADR-002 as dated records before Phase 00.
+6. Leave ADR-003–012 as candidates until their phases. C-05/C-06 remain documented; only the waiver-signature part of C-05 is applied.
 
 ---
 
@@ -367,13 +373,17 @@ No application code. If this review is accepted, patch the owning documents in t
 Copy and fill:
 
 ```text
-C-01 Precision@K: accept / revise / reject — notes:
-C-02 Exit 130: accept / revise / reject — notes:
-C-03 ERROR vs Incomplete: accept / revise / reject — notes:
-C-04 INVALID denominator: accept / revise / reject — notes:
-C-05 Signature vs hash: accept / revise / reject — notes:
-C-06 run vs compare: accept / revise / reject — notes:
-C-07 Learning create vs update: accept / revise / reject — notes:
+C-01 Precision@K: accept — divide by K
+C-02 Exit 130: accept — added to PRD FR-13
+C-03 ERROR vs Incomplete: accept — applied
+C-04 INVALID denominator: accept — applied
+C-05 Signature vs hash: revise — GitHub evidence in Phase 07; app signatures in Phase 08
+C-06 run vs compare: not in this review pass
+C-07 Learning create vs update: accept — Phase 09 updates existing file
+C-08 Phase 03 depends on 02: accept — roadmap, diagram, Phase 03
+G-07 Regex: reject as written — trusted repo patterns only; no re timeout
+G-08 JSON Schema: accept with jsonschema in Phase 02
+G-27 Waiver approval: revise — protected GitHub evidence in Phase 07
 
 G-01..G-12 dataset gaps: accept-all / list revisions:
 G-13..G-22 metric/judge/gate gaps: accept-all / list revisions:

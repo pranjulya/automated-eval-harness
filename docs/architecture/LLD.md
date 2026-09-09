@@ -123,11 +123,18 @@ The registry is an explicit dictionary from `Profile` to a tuple of evaluator in
 6. Missing/invalid/uncalibrated required semantic evidence returns `REVIEW_REQUIRED`.
 7. All required dimensions passing returns `PASS`.
 
+### Run completeness versus case state
+
+- Suite/config/hash failure: run status `Invalid`, exit `4`, no case scoring.
+- Missing expected cases, process interrupt before finalize, or corrupt/partial bundle: run status `Incomplete`; exit `4`, `5`, or `130`. No `PASS`/`BLOCK`/`REVIEW_REQUIRED`.
+- Bounded invocation failure (timeout, rate limit, malformed outcome after retries): case state `ERROR`; the run stays completed and comparable; `ERROR` remains in the denominator.
+- After a successful load, per-case `INVALID` is an internal defect: run non-comparable, exit `5`.
+
 ## 7. Metric edge semantics
 
 - Scores are floats in `[0,1]` unless the metric contract states a rank/count/duration.
 - `Recall@K` with no relevant labels is invalid for answerable retrieval cases; no-answer cases use no-answer metrics instead.
-- `Precision@K` denominator is actual returned count capped at K; zero returned yields `0.0` for an answerable case.
+- `Precision@K = relevant identities in top K / K`. Fewer than K results still divide by K (short lists are penalized). Zero returned for an answerable case yields `0.0`. No-answer cases do not use Precision@K.
 - `MRR` is zero without a relevant hit.
 - `nDCG` is omitted when labels are binary-only or ideal DCG is zero.
 - Duplicate evidence identities count once at the earliest rank.
@@ -198,6 +205,8 @@ eval-harness compare --candidate RUN_ID --baseline CHANNEL
 eval-harness inspect --run RUN_ID [--failures-only] [--format text|json]
 eval-harness promote-baseline --run RUN_ID --suite NAME --channel NAME --reason TEXT --approval-file PATH
 ```
+
+`--approval-file` in V1 is a JSON record of protected GitHub approval evidence (actor, review URL, required-reviewer path), not an application cryptographic signature. Cryptographic signatures wait until Phase 08 selects an identity provider.
 
 Common stdout is a compact summary; machine JSON is selected explicitly. Diagnostics go to stderr. Exit codes are `0 PASS/success`, `2 BLOCK`, `3 REVIEW_REQUIRED`, `4 invalid/non-comparable`, `5 infrastructure/internal error`, and `130 interrupted`. Partial selectors cannot promote a baseline or claim full-suite release eligibility.
 

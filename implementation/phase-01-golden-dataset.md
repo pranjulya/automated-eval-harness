@@ -8,7 +8,7 @@ Implement strict case/suite schemas, safe loading, content hashing, fixture vali
 
 ## Prerequisites and decisions
 
-Phase 00 `COMPLETE`; ADR-003 accepted; dataset owners/reviewers named; synthetic fixture license and privacy classification accepted.
+Phase 00 `COMPLETE`; ADR-003 accepted; dataset owners/reviewers named; repository `LICENSE` applies to synthetic fixtures; privacy classification accepted.
 
 ## References and concepts
 

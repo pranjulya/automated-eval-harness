@@ -3,7 +3,7 @@
 **Review result:** READY_FOR_USER_REVIEW; NOT APPROVED_FOR_IMPLEMENTATION  
 **Reviewed scope:** Planning documents only.
 
-Follow-up findings (not yet accepted): `docs/architecture/planning-gap-analysis.md`. Independent review of that file should complete before Phase 00. It does not authorize application code.
+Follow-up findings: `docs/architecture/planning-gap-analysis.md`. Independent review accepted the key locks in that file’s §11; owning documents were patched 2026-09-10. Remaining gaps stay open. It does not authorize application code.
 
 ## 1. Requirements and consistency
 

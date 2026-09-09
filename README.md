@@ -11,7 +11,7 @@ No application code exists yet. Start with `Implementation.md`, then read the pr
 - Golden data contract: `docs/evaluation/golden-dataset.md`
 - Architecture: `docs/architecture/HLD.md`, `docs/architecture/LLD.md`, and `docs/architecture/threat-model.md`
 - Readiness review: `docs/architecture/architecture-review.md`
-- Pre-implementation gap analysis (open for review): `docs/architecture/planning-gap-analysis.md`
+- Pre-implementation gap analysis: `docs/architecture/planning-gap-analysis.md` (key locks applied 2026-09-10)
 - Decisions to accept before phases: `docs/architecture/decisions/ADR-candidates.md`
 - Failure triage: `docs/operations/failure-triage.md`
 - Master roadmap: `Implementation.md`

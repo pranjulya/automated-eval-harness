@@ -99,7 +99,7 @@ The service samples eligible, consented, redacted production outcomes, calculate
 - **FR-10:** Replay a run from normalized outcomes to reproduce evaluation and gate decisions without invoking the target.
 - **FR-11:** Compare candidate and baseline case-by-case, aggregate by primary profile/tag, calculate defined confidence evidence, and return stable reasons.
 - **FR-12:** Return exactly one decision: `PASS`, `BLOCK`, or `REVIEW_REQUIRED`.
-- **FR-13:** Use stable exit codes: `0 PASS`, `2 BLOCK`, `3 REVIEW_REQUIRED`, `4 invalid/non-comparable run`, `5 infrastructure/internal failure`.
+- **FR-13:** Use stable exit codes: `0 PASS`, `2 BLOCK`, `3 REVIEW_REQUIRED`, `4 invalid/non-comparable run`, `5 infrastructure/internal failure`, `130 interrupted`.
 - **FR-14:** Create baseline pointers only through an explicit authorized promotion command; never during normal run/compare.
 - **FR-15:** Generate `summary.json`, `cases.jsonl`, `manifest.json`, and `report.md` with compatible schema versions; complete release runs also generate `comparison.json`, while exploratory runs without a baseline are explicitly non-release.
 - **FR-16:** Expose CLI contracts for validate, run, replay, compare, promote-baseline, and inspect.

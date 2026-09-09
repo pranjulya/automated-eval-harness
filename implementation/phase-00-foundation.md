@@ -18,7 +18,7 @@ Read PRD §§8–9, HLD §§1–2/6, LLD §§1/11/13, and `AGENTS.md`. Learn pac
 
 ## Files
 
-- Create `pyproject.toml`, lock file, `.gitignore`, `.dockerignore`, `.env.example`.
+- Create `pyproject.toml`, lock file, `.dockerignore`, `.env.example`. Keep existing `LICENSE` and `.gitignore`; do not replace the license without review.
 - Create `src/eval_harness/__init__.py`, `config.py`, `errors.py`, `cli.py`, `__main__.py`.
 - Create `tests/unit/test_config.py`, `tests/unit/test_cli.py`, `tests/unit/test_errors.py`.
 - Create `Dockerfile`, `.github/workflows/ci.yml`.
