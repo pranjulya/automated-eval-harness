@@ -1,7 +1,7 @@
 # Architecture Review and Readiness Checklist
 
-**Review result:** READY_FOR_USER_ACCEPTANCE (re-run 2026-09-10); planning locks C-01–C-08 applied and ADR-001–ADR-012 accepted. No unresolved blocker; Phases 05/07/08 external gates remain owner actions.  
-**Reviewed scope:** Planning documents plus implemented Phases 00–04, 06, 09 and the code-complete parts of 05/07/08.
+**Review result:** V1_CORE_ACCEPTED (2026-09-10); planning locks C-01–C-08 applied and ADR-001–ADR-013 accepted. No unresolved blocker for the V1 deterministic core; Phases 05/07/08 are `DEFERRED_POST_V1` (ADR-013).  
+**Reviewed scope:** Planning documents plus implemented Phases 00–04, 06, 09, 10 and the shipped, fail-closed deferred-phase code.
 
 Follow-up findings: `docs/architecture/planning-gap-analysis.md`. Independent review accepted the key locks in that file’s §11; owning documents were patched 2026-09-10. Remaining gaps stay open. It does not authorize application code.
 
@@ -76,7 +76,7 @@ The object store, identity provider, target provider, judge provider, absolute l
 
 ## 10. Approval gate
 
-Implementation began one phase at a time. ADR-001/002 are accepted; Phases 00–04, 06, and 09 are `COMPLETE`. Phases 05, 07, and 08 are code-complete but blocked on external inputs (calibration labels/provider, repository protections/credentials, IdP/object store). Final project `COMPLETE` requires the release owner to accept `docs/operations/release-evidence.md`.
+Implementation ran one phase at a time. Phases 00–04, 06, 09, and 10 are `COMPLETE`. Per ADR-013 (2026-09-10) the owner accepted the offline deterministic core as V1 and deferred Phases 05, 07, and 08 to a post-V1 deployment-enablement milestone; that code is shipped and fail-closed. No blocker remains for the accepted V1 scope.
 
 ## 11. Implementation evidence (2026-09-10)
 

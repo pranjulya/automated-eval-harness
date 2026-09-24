@@ -160,3 +160,5 @@ The service samples eligible, consented, redacted production outcomes, calculate
 ## 13. Release gate
 
 V1 is releasable only after the 50-case suite, deterministic metrics, target adapters, immutable bundles, judge calibration, baseline comparison, statistical policy, CI block, access controls, observability, extension proofs, clean-container run, and failure/security drills meet their phase Definitions of Done. This planning package authorizes no application code or deployment.
+
+**V1 scope decision (ADR-013, 2026-09-10):** V1 ships the offline deterministic core. Semantic judge gating (Phase 05), repository protections/credentials (Phase 07), and real identity provider/object store (Phase 08) are deferred to a post-V1 deployment-enablement milestone; their code is shipped and fail-closed, and the harness returns `REVIEW_REQUIRED` where calibrated semantic evidence or a trusted baseline is required.

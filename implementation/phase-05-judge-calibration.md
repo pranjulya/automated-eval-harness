@@ -1,6 +1,6 @@
 # Phase 05 — Semantic Judge Rubrics and Calibration
 
-**Status:** IN_PROGRESS — code and tests complete; blocked on human calibration evidence (≥20 adjudicated labels, ≥5 per gated rubric) and an approved judge provider. No approved calibration file is shipped.
+**Status:** DEFERRED_POST_V1 (ADR-013) — code and tests complete; semantic gating deferred pending human calibration labels and an approved judge provider. No approved calibration file is shipped.
 
 ## Goal
 
