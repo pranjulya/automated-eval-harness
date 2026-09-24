@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: use `superpowers:subagent-driven-development` or `superpowers:executing-plans` after user approval. Execute one phase at a time with test-first steps and review gates.
 
-**Status:** APPROVED_FOR_IMPLEMENTATION — Phases 00–04, 06, and 09 `COMPLETE`; Phases 05/07/08 code complete (blocked on external labels/protections/IdP); Phase 10 not started
+**Status:** REVIEWED_FOR_USER_ACCEPTANCE — Phases 00–04, 06, 09 `COMPLETE`; Phases 05/07/08 code complete (blocked on external labels/protections/IdP); Phase 10 `REVIEWED`. Release evidence: `docs/operations/release-evidence.md`. Project `COMPLETE` pending release-owner acceptance.
 **Goal:** Build a reproducible, provider-neutral GenAI evaluation harness that scores 50 golden cases, explains failures by capability, and prevents quality regressions from reaching deployment.  
 **Architecture:** A shared Python evaluation core loads immutable dataset/config artifacts, invokes a system under test through a typed adapter, applies deterministic evaluators before optional calibrated judges, writes an immutable run bundle, and compares it with a reviewed baseline. The CLI is authoritative; CI and a later thin authenticated HTTP API call the same services.  
 **Tech stack:** Python 3.12+, standard-library `argparse`, Pydantic v2, HTTPX, pytest, Ruff, mypy, `jsonschema` (Draft 2020-12 structured-output validation in Phase 02 evaluators), FastAPI for the optional service surface, OpenTelemetry, Docker, GitHub Actions. Exact supported versions are locked in Phase 00 after then-current verification. `jsonschema` is added and justified in Phase 02, not Phase 00.  
@@ -160,7 +160,7 @@ Project-07-Automated-Eval-Harness/
 | 07 | CI quality gates, waivers, clean-container execution | 06, ADR-008 | IN_PROGRESS (blocked on repo protections/credentials) |
 | 08 | Thin authenticated API, observability, security/privacy, online sampling | 07, ADR-009/010 | IN_PROGRESS (blocked on IdP/object store) |
 | 09 | RAG, structured-output, and tool-use extension proof | 02–08 | COMPLETE |
-| 10 | Production drills, documentation, learning, final review | 09 | NOT_STARTED |
+| 10 | Production drills, documentation, learning, final review | 09 | REVIEWED (awaiting user acceptance) |
 
 ## 13. Phase dependency map
 

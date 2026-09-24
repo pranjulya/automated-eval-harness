@@ -50,7 +50,12 @@ docker run --rm eval-harness:dev --version
 - Readiness review: `docs/architecture/architecture-review.md`
 - Pre-implementation gap analysis: `docs/architecture/planning-gap-analysis.md`
 - Accepted decisions: `docs/architecture/decisions/`
+- Extension profile authoring: `docs/architecture/extension-profiles.md`
 - Failure triage: `docs/operations/failure-triage.md`
+- CLI/API reference: `docs/operations/cli-api-reference.md`
+- Service runbook: `docs/operations/service-runbook.md`
+- Release checklist: `docs/operations/release-checklist.md`
+- Release evidence index: `docs/operations/release-evidence.md`
 - Master roadmap: `Implementation.md`
 - Executable phase specifications: `implementation/`
 - Guided study material: `Learning/`
@@ -67,3 +72,7 @@ docker run --rm eval-harness:dev --version
 ## Deliberate V1 omissions
 
 No dashboard SPA, custom workflow engine, distributed scheduler, SQL database, MLflow deployment, prompt-management SaaS, or automatic production optimization. Immutable filesystem/object-store artifacts and a small CLI cover the first release; add infrastructure only when measured scale or collaboration needs require it.
+
+## Service surface
+
+A thin FastAPI wrapper in `src/eval_harness/api.py` exposes the same application services as the CLI (runs, comparisons, baselines, online samples) with Bearer-token auth and role-based authorization. See `docs/operations/cli-api-reference.md`. Identity provider and object store are deployment selections; local defaults are documented in `docs/operations/service-runbook.md`.
