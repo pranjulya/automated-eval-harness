@@ -1,6 +1,6 @@
 # Phase 02 — Deterministic Evaluators and Metrics
 
-**Status:** NOT_STARTED
+**Status:** COMPLETE (2026-09-10) — pure metrics match hand-calculated fixtures; hard-invariant and profile evaluators tested; `jsonschema` confined to the structured evaluator.
 
 ## Goal
 
@@ -31,15 +31,15 @@ Read evaluation strategy §§3/5/7 and LLD §§2/6/7. Learn validity versus qual
 
 ## Tasks
 
-- [ ] Write hand-calculated failing tests for normal, empty, duplicate, graded, boundary, and invalid-label metric inputs.
-- [ ] Implement the minimum pure metric functions with documented types and deterministic ordering.
-- [ ] Write failing hard-invariant tests for schema acceptance, forbidden tool/action, citation identity, evidence boundary, canary disclosure, and integrity findings.
-- [ ] Implement cross-cutting invariant evaluators.
-- [ ] Add `jsonschema` in this phase, lock the version in the existing lockfile, and confine it to the structured evaluator. Domain modules remain free of that library.
-- [ ] Add text/safety/structured/RAG/tool evaluators one at a time, each driven by profile fixtures and stable evidence paths. Structured schema checks use Draft 2020-12. Text regex uses only trusted repository-authored patterns; do not compile target output as a pattern and do not claim a `re` timeout.
-- [ ] Test case-state precedence: invocation error, hard fail, deterministic fail, required semantic unavailable, pass.
-- [ ] Add metamorphic checks for case-order invariance, duplicate evidence collapse, monotonic K behavior, and stricter-threshold monotonicity.
-- [ ] Document every metric's denominator, unavailable state, and interpretation.
+- [x] Write hand-calculated failing tests for normal, empty, duplicate, graded, boundary, and invalid-label metric inputs.
+- [x] Implement the minimum pure metric functions with documented types and deterministic ordering.
+- [x] Write failing hard-invariant tests for schema acceptance, forbidden tool/action, citation identity, evidence boundary, canary disclosure, and integrity findings. (Integrity is a run/CI invariant; its finding is exercised in Phase 04.)
+- [x] Implement cross-cutting invariant evaluators.
+- [x] Add `jsonschema` in this phase, lock the version in the existing lockfile, and confine it to the structured evaluator. Domain modules remain free of that library.
+- [x] Add text/safety/structured/RAG/tool evaluators one at a time, each driven by profile fixtures and stable evidence paths. Structured schema checks use Draft 2020-12. Text regex uses only trusted repository-authored patterns; do not compile target output as a pattern and do not claim a `re` timeout.
+- [x] Test case-state precedence: invocation error, hard fail, deterministic fail, required semantic unavailable, pass.
+- [x] Add metamorphic checks for case-order invariance, duplicate evidence collapse, monotonic K behavior, and stricter-threshold monotonicity.
+- [x] Document every metric's denominator, unavailable state, and interpretation.
 
 ## Tests and failure scenarios
 
@@ -52,3 +52,12 @@ Run `python -m pytest tests/unit/test_metrics.py tests/unit/evaluators -q`, prop
 ## Acceptance criteria and Definition of Done
 
 Every deterministic V1 requirement maps to an evaluator/finding code; every metric has exact fixtures and edge semantics; hard invariants cannot be downgraded; evaluator order does not change results; no I/O/framework/provider dependency enters domain code; docs/Learning/diff review complete; phase reaches `COMPLETE`.
+
+## Verification evidence (2026-09-10)
+
+- `uv run pytest tests -q --cov=eval_harness` — **160 passed**; coverage **93%** (gate 85%).
+- Hand-calculated fixtures for Recall/Precision@K, MRR, nDCG@K, pass rate, precision/recall/F1, percentiles, and context recall all match.
+- Boundary/metamorphic tests: empty retrieval, no labels, short lists, duplicate collapse, K monotonicity, threshold monotonicity, invalid K, overshoot pass rate.
+- `uv run ruff format --check .` and `uv run ruff check .` — clean.
+- `uv run mypy src/eval_harness` — Success: no issues found in 23 source files.
+- `jsonschema` is imported only by `evaluators/structured.py`; `domain/` imports no library.

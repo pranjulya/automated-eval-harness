@@ -1,0 +1,25 @@
+{
+  "pass_rate": [
+    {"passed": 45, "total": 50, "rate": 0.9},
+    {"passed": 50, "total": 50, "rate": 1.0},
+    {"passed": 0, "total": 0, "rate": null}
+  ],
+  "confusion": {
+    "true_positive": 3,
+    "false_positive": 1,
+    "false_negative": 2,
+    "precision": 0.75,
+    "recall": 0.6,
+    "f1": 0.6666666666666666
+  },
+  "percentiles": [
+    {"values": [10, 20, 30, 40, 50], "p50": 30.0, "p95": 50.0, "p100": 50.0},
+    {"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "p50": 10.0, "p95": 19.0},
+    {"values": [], "p50": null}
+  ],
+  "context_recall": [
+    {"context": ["a", "b"], "required": ["a", "b"], "recall": 1.0},
+    {"context": ["a"], "required": ["a", "b"], "recall": 0.5},
+    {"context": [], "required": [], "recall": null}
+  ]
+}
