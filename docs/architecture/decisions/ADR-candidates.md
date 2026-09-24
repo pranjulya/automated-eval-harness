@@ -15,7 +15,7 @@
 | ADR-008 | CI and waivers | trusted base-branch baseline, stable exit codes, immutable artifacts, scoped expiring waiver with protected GitHub approval evidence; hard invariants non-waivable | candidate-owned baseline; permanent ignore list; app signatures before an IdP exists | 07 — ACCEPTED 2026-09-10, release wiring gated on credentials (`ADR-008-ci-and-waivers.md`) |
 | ADR-009 | HTTP/service scope | read-mostly FastAPI wrapper and protected promotions; platform job runner if needed | custom distributed queue/dashboard SPA | 08 — ACCEPTED 2026-09-10, IdP/object store at deployment (`ADR-009-http-service-scope.md`) |
 | ADR-010 | Online evaluation/privacy | opt-in sampling, redact before persist, quarantine, human promotion only | ingest all traces; auto-golden/auto-baseline | 08 — ACCEPTED 2026-09-10, TTLs at deployment (`ADR-010-online-evaluation-privacy.md`) |
-| ADR-011 | Extension boundary | first-party discriminated profiles reuse one runner/result/gate lifecycle | dynamic plugin marketplace; profile-specific runners | 09 |
+| ADR-011 | Extension boundary | first-party discriminated profiles reuse one runner/result/gate lifecycle | dynamic plugin marketplace; profile-specific runners | 09 — ACCEPTED 2026-09-10 (`ADR-011-extension-boundary.md`) |
 | ADR-012 | Nondeterminism | record capability, three release replicates when needed, majority/median aggregation, deterministic replay of outcomes | pretending temperature zero is deterministic | 06 — ACCEPTED 2026-09-10 (`ADR-012-nondeterminism.md`) |
 
 ## Consequences to make explicit

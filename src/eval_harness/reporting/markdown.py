@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from ..domain.findings import Severity
 from ..domain.runs import CaseResult, RunManifest, Summary
 
 __all__ = ["escape", "render_report"]
@@ -24,6 +25,16 @@ def escape(value: str) -> str:
 
 def _fmt(value: float | None) -> str:
     return "n/a" if value is None else f"{value:.4f}"
+
+
+def _profile_diagnostics(results: Sequence[CaseResult]) -> dict[str, dict[str, list[float]]]:
+    diagnostics: dict[str, dict[str, list[float]]] = {}
+    for result in results:
+        bucket = diagnostics.setdefault(result.primary_profile.value, {})
+        for finding in result.findings:
+            if finding.severity is Severity.INFO and finding.score is not None:
+                bucket.setdefault(finding.code, []).append(finding.score)
+    return diagnostics
 
 
 def render_report(manifest: RunManifest, summary: Summary, results: Sequence[CaseResult]) -> str:
@@ -81,6 +92,22 @@ def render_report(manifest: RunManifest, summary: Summary, results: Sequence[Cas
     for state, count in sorted(summary.state_counts.items()):
         lines.append(f"| {escape(state)} | {count} |")
 
+    lines.append("")
+    lines.append("## Profile diagnostics")
+    lines.append("")
+    diagnostics = _profile_diagnostics(results)
+    if diagnostics:
+        lines.append("| Profile | Metric | Mean | Samples |")
+        lines.append("|---|---|---:|---:|")
+        for profile_name in sorted(diagnostics):
+            for code in sorted(diagnostics[profile_name]):
+                scores = diagnostics[profile_name][code]
+                mean = sum(scores) / len(scores)
+                lines.append(
+                    f"| {escape(profile_name)} | {escape(code)} | {mean:.4f} | {len(scores)} |"
+                )
+    else:
+        lines.append("_No profile diagnostics recorded._")
     lines.append("")
     lines.append("## Cases")
     lines.append("")

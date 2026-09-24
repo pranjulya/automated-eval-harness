@@ -1,6 +1,6 @@
 # Phase 09 — Structured-Output, RAG, and Tool-Use Extension Proof
 
-**Status:** NOT_STARTED
+**Status:** COMPLETE (2026-09-10) — all 32 complex-profile goldens execute and diagnose through the shared runner; fake/HTTP parity and report diagnostics verified. (Blocked external parts of Phases 05/07/08 do not affect these deterministic profiles.)
 
 ## Goal
 
@@ -29,13 +29,13 @@ Read dataset design §4, evaluation strategy §3, HLD §7, LLD §§3/6–7. Lear
 
 ## Tasks
 
-- [ ] Structured E2E: valid nested output, wrong type/enum, extra field, missing field, range/business assertion, malformed/trailing output; prove schema-acceptance invariant.
-- [ ] RAG E2E: lexical/semantic/distractor/multi-document/no-answer cases; verify deduped Recall@K/MRR/nDCG eligibility, context recall, claim support, citation identity/correctness/completeness, and evidence boundary.
-- [ ] Tool E2E: expected/forbidden selection, exact/subset arguments, order/partial order, maximum steps, loops, termination, and recovery; prove forbidden call hard block.
-- [ ] Run all profiles through fake and HTTP normalized contracts; compare/replay without special runner paths.
-- [ ] Verify reports and API filtering expose profile evidence safely and gate profiles independently.
-- [ ] Add a new-profile compile-time/test example in docs without implementing a dynamic plugin loader.
-- [ ] Review evaluator performance and streaming/bounded-memory behavior across the 50-case suite.
+- [x] Structured E2E: valid nested output, wrong type/enum, extra field, missing field, range/business assertion, malformed/trailing output; prove schema-acceptance invariant.
+- [x] RAG E2E: lexical/semantic/distractor/multi-document/no-answer cases; verify deduped Recall@K/MRR/nDCG eligibility, context recall, claim support, citation identity/correctness/completeness, and evidence boundary.
+- [x] Tool E2E: expected/forbidden selection, exact/subset arguments, order/partial order, maximum steps, loops, termination, and recovery; prove forbidden call hard block.
+- [x] Run all profiles through fake and HTTP normalized contracts; compare/replay without special runner paths.
+- [x] Verify reports and API filtering expose profile evidence safely and gate profiles independently.
+- [x] Add a new-profile compile-time/test example in docs without implementing a dynamic plugin loader.
+- [x] Review evaluator performance and streaming/bounded-memory behavior across the 50-case suite. (Loader streams JSONL with per-record and nesting limits; evaluators are pure and linear.)
 
 ## Tests and failure scenarios
 
@@ -48,3 +48,10 @@ Run all profile unit/contract/E2E tests, then the full 50-case fake and HTTP-loc
 ## Acceptance criteria and Definition of Done
 
 All complex goldens execute and diagnose correctly, metrics match hand labels, schema/tool/citation/isolation invariants hold, no profile forks lifecycle/persistence/gating, reports remain safe, docs/Learning/review complete, and phase reaches `COMPLETE`.
+
+## Verification evidence (2026-09-10)
+
+- `uv run pytest tests -q --cov=eval_harness` — **401 passed**; coverage **~89%** (gate 85%).
+- `tests/e2e/test_extension_profiles.py`: all 32 complex cases pass; each structured/RAG/tool failure mode is attributed to its stable code with the correct severity; fake and HTTP normalize identically for all 32; replay and compare use no profile-specific path; the report renders the profile-diagnostics section.
+- `docs/architecture/extension-profiles.md` documents the three extension points and the no-plugin rule.
+- `uv run ruff format --check .` / `uv run ruff check .` / `uv run mypy src/eval_harness` — clean (59 source files).
