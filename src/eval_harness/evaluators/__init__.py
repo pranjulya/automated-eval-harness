@@ -59,12 +59,18 @@ def evaluate_case(
 
 
 def case_state(
-    case: EvalCase, outcome: NormalizedOutcome, findings: tuple[Finding, ...]
+    case: EvalCase,
+    outcome: NormalizedOutcome,
+    findings: tuple[Finding, ...],
+    *,
+    semantic_available: bool | None = None,
 ) -> CaseState:
-    semantic = case.expectation.semantic
-    requires_semantic = semantic is not None and bool(semantic.dimensions)
+    if semantic_available is None:
+        semantic = case.expectation.semantic
+        requires_semantic = semantic is not None and bool(semantic.dimensions)
+        semantic_available = not requires_semantic
     return derive_case_state(
         findings,
         outcome_usable=outcome.usable,
-        required_semantic_available=not requires_semantic,
+        required_semantic_available=semantic_available,
     )

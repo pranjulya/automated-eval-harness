@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
 from pathlib import Path
@@ -15,9 +15,12 @@ from ..adapters.artifacts.filesystem import FilesystemArtifactStore
 from ..adapters.targets.base import TargetAdapter, TargetConfig
 from ..application.aggregate import aggregate
 from ..application.invocation import InvocationService, RetryPolicy
+from ..application.judging import JudgeService, requires_semantic, score_dimensions
 from ..datasets import load_suite
 from ..datasets.hashing import canonical_json, sha256_hex
 from ..domain.cases import EvalCase, Profile
+from ..domain.findings import Finding, Severity
+from ..domain.judging import CalibrationRecord, Rubric
 from ..domain.outcomes import NormalizedOutcome
 from ..domain.runs import (
     AttemptRecord,
@@ -66,6 +69,10 @@ class RunService:
         environment: str = "development",
         invocation: InvocationService | None = None,
         now: Callable[[], datetime] = lambda: datetime.now(UTC),
+        judge: JudgeService | None = None,
+        judge_identity: dict[str, object] | None = None,
+        rubrics: Mapping[str, Rubric] | None = None,
+        calibrations: Mapping[str, CalibrationRecord] | None = None,
     ) -> None:
         self._adapter = adapter
         self._registry = registry
@@ -73,6 +80,10 @@ class RunService:
         self._environment = environment
         self._invocation = invocation or InvocationService()
         self._now = now
+        self._judge = judge
+        self._judge_identity = judge_identity
+        self._rubrics: Mapping[str, Rubric] = rubrics or {}
+        self._calibrations: Mapping[str, CalibrationRecord] = calibrations or {}
 
     def run(self, request: RunRequest) -> RunOutcome:
         suite = load_suite(request.suite_path)
@@ -100,6 +111,7 @@ class RunService:
             environment=self._environment,
             requested_case_ids=tuple(case.case_id for case in cases),
             nondeterministic=request.config.target.externally_nondeterministic,
+            judge=dict(self._judge_identity) if self._judge_identity else None,
         )
         writer = store.begin(run_id)
         try:
@@ -167,8 +179,17 @@ class RunService:
             case, self._adapter, request.config.target, request.config.retry
         )
         outcome = record.outcome
-        findings = evaluate_case(case, outcome, self._registry)
-        state = case_state(case, outcome, findings)
+        findings = list(evaluate_case(case, outcome, self._registry))
+        semantic_available: bool | None = None
+        if (
+            self._judge is not None
+            and requires_semantic(case)
+            and not _has_decisive_failure(findings)
+        ):
+            scored = score_dimensions(self._judge, case, outcome, self._rubrics, self._calibrations)
+            findings.extend(scored.findings)
+            semantic_available = scored.available
+        state = case_state(case, outcome, tuple(findings), semantic_available=semantic_available)
         attempts = [
             AttemptRecord(
                 run_id=run_id,
@@ -189,7 +210,7 @@ class RunService:
             primary_profile=case.primary_profile,
             sequence=sequence,
             state=state,
-            findings=findings,
+            findings=tuple(findings),
             outcome_hash=sha256_hex(canonical_json(outcome.model_dump(mode="json"))),
             attempts=len(attempts),
             latency_ms=attempts[-1].elapsed_ms,
@@ -200,6 +221,11 @@ class RunService:
             "outcome": outcome.model_dump(mode="json"),
         }
         return result, [record_row.model_dump(mode="json") for record_row in attempts], outcome_row
+
+
+def _has_decisive_failure(findings: list[Finding]) -> bool:
+    decisive = {Severity.HARD_INVARIANT, Severity.DETERMINISTIC}
+    return any(finding.is_failure and finding.severity in decisive for finding in findings)
 
 
 def _select_cases(cases: tuple[EvalCase, ...], request: RunRequest) -> list[EvalCase]:

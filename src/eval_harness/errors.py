@@ -20,6 +20,8 @@ __all__ = [
     "HarnessError",
     "InfrastructureError",
     "InterruptedRunError",
+    "JudgeInvalidError",
+    "JudgeUnavailableError",
     "PhaseUnavailableError",
     "envelope",
     "redact_text",
@@ -123,6 +125,21 @@ class InfrastructureError(HarnessError):
 
     code = "INTERNAL_ERROR"
     exit_code = ExitCode.INFRASTRUCTURE
+
+
+class JudgeUnavailableError(HarnessError):
+    """The judge provider could not produce a usable score."""
+
+    code = "JUDGE_UNAVAILABLE"
+    exit_code = ExitCode.REVIEW_REQUIRED
+    retryable = True
+
+
+class JudgeInvalidError(HarnessError):
+    """The judge returned malformed or out-of-contract output."""
+
+    code = "JUDGE_INVALID"
+    exit_code = ExitCode.REVIEW_REQUIRED
 
 
 class InterruptedRunError(HarnessError):

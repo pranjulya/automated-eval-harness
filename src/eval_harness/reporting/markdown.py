@@ -43,6 +43,10 @@ def render_report(manifest: RunManifest, summary: Summary, results: Sequence[Cas
     lines.append(f"| Target | {adapter_name} / {model_name} |")
     lines.append(f"| Commit | `{escape(manifest.code.commit)}` (dirty={manifest.code.dirty}) |")
     lines.append(f"| Status | {escape(str(manifest.status))} |")
+    if manifest.judge:
+        provider = escape(str(manifest.judge.get("provider", "unknown")))
+        model = escape(str(manifest.judge.get("model", "unknown")))
+        lines.append(f"| Judge | {provider} / {model} |")
 
     lines.append("")
     lines.append("## Summary")

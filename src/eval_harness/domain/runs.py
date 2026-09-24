@@ -126,6 +126,7 @@ class RunManifest(_Model):
     requested_case_ids: tuple[str, ...]
     finished_case_ids: tuple[str, ...] = ()
     nondeterministic: bool = False
+    judge: dict[str, object] | None = None
 
 
 class RunOutcome(_Model):

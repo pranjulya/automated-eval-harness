@@ -1,6 +1,6 @@
 # Phase 05 — Semantic Judge Rubrics and Calibration
 
-**Status:** NOT_STARTED
+**Status:** IN_PROGRESS — code and tests complete; blocked on human calibration evidence (≥20 adjudicated labels, ≥5 per gated rubric) and an approved judge provider. No approved calibration file is shipped.
 
 ## Goal
 
@@ -30,14 +30,14 @@ Read evaluation strategy §4 and PRD goals/non-goals/security. Learn construct v
 
 ## Tasks
 
-- [ ] Define anchored rubrics for relevance, faithfulness, completeness, and citation support; remove any generic overall-quality prompt.
-- [ ] Write fake/HTTP judge contract tests for strict structured output, identity, timeout/rate limits, malformed values, unknown evidence, injection, and redaction.
-- [ ] Implement eligibility checks that reject missing/mismatched/unapproved calibration.
-- [ ] Implement calibration calculations and tests for kappa, exact pass/fail agreement, three-run repeatability, and slice gaps.
-- [ ] Produce at least 20 independent human case-dimension labels with both pass/fail and at least five per gated rubric, adjudicate disagreement, run approved judge repeats, and publish immutable calibration evidence.
-- [ ] Integrate semantic findings only for dimensions requested by cases; skip judges after decisive deterministic failure.
-- [ ] Make unavailable/invalid/uncalibrated required judging yield `REVIEW_REQUIRED`, never silent pass or zero score.
-- [ ] Add judge identity/usage/cost/latency to manifests and reports without sensitive content.
+- [x] Define anchored rubrics for relevance, faithfulness, completeness, and citation support; remove any generic overall-quality prompt.
+- [x] Write fake/HTTP judge contract tests for strict structured output, identity, timeout/rate limits, malformed values, unknown evidence, injection, and redaction.
+- [x] Implement eligibility checks that reject missing/mismatched/unapproved calibration.
+- [x] Implement calibration calculations and tests for kappa, exact pass/fail agreement, three-run repeatability, and slice gaps.
+- [ ] Produce at least 20 independent human case-dimension labels with both pass/fail and at least five per gated rubric, adjudicate disagreement, run approved judge repeats, and publish immutable calibration evidence. **Human gate — not started.**
+- [x] Integrate semantic findings only for dimensions requested by cases; skip judges after decisive deterministic failure.
+- [x] Make unavailable/invalid/uncalibrated required judging yield `REVIEW_REQUIRED`, never silent pass or zero score.
+- [x] Add judge identity/usage/cost/latency to manifests and reports without sensitive content.
 
 ## Tests and failure scenarios
 
@@ -50,3 +50,15 @@ Run all fake/local judge and calibration tests; run provider calibration only wi
 ## Acceptance criteria and Definition of Done
 
 Rubrics are narrow and versioned, judge results are strict/untrusted, calibration is immutable and human-reviewed, eligibility thresholds are enforced, deterministic failures remain authoritative, failures expose uncertainty, cost/privacy controls hold, docs/Learning/review complete, and phase reaches `COMPLETE`.
+
+## Verification evidence (2026-09-10) — code portion
+
+- `uv run pytest tests -q --cov=eval_harness` — **281 passed**; coverage ~91% (gate 85%).
+- Calibration fixture: kappa `0.875`, exact agreement `0.95`, repeat agreement `0.90`, worst slice gap `0.05` → eligible; five-label and inverted-judge cases are ineligible with explicit failure reasons.
+- Judge contract tests cover fake + HTTP success, 5xx, malformed, oversize, missing secret, and secret non-disclosure.
+- Service tests cover calibrated pass/fail, draft/missing calibration → `JUDGE_UNCALIBRATED`, outage → `JUDGE_UNAVAILABLE`, malformed → `JUDGE_INVALID`, redaction before judging, and decisive-failure skip.
+- `uv run ruff format --check .` / `uv run ruff check .` / `uv run mypy src/eval_harness` — clean (46 source files).
+
+## Outstanding blocker
+
+`COMPLETE` requires real human adjudicated labels and an approved paid provider run to publish `evaluation/calibrations/**`. Until then, semantic gating stays informational and the runner leaves semantic-required cases at `REVIEW_REQUIRED`.
