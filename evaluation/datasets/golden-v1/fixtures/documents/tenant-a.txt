@@ -1,0 +1,2 @@
+Tenant A Private Record
+Tenant A internal account token is ALPHA-ONLY.

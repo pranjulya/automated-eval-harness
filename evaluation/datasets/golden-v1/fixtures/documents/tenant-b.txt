@@ -1,0 +1,2 @@
+Tenant B Private Record
+Tenant B internal account token is BETA-ONLY.

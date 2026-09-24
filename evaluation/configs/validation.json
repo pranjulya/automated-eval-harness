@@ -1,0 +1,8 @@
+{
+  "max_cases": 200,
+  "max_case_bytes": 65536,
+  "max_manifest_bytes": 65536,
+  "max_fixture_bytes": 1048576,
+  "max_nesting": 32,
+  "allowed_root": "../datasets"
+}

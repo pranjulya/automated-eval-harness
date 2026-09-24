@@ -1,0 +1,52 @@
+{
+  "name": "golden-v1",
+  "suite_version": "1.0.0",
+  "schema_version": "eval.case.v1",
+  "case_count": 50,
+  "profile_counts": {
+    "rag": 12,
+    "safety_abstention": 6,
+    "structured_output": 10,
+    "text_semantic": 12,
+    "tool_use": 10
+  },
+  "fixture_roots": [
+    "fixtures"
+  ],
+  "owners": [
+    "project-team"
+  ],
+  "created": "2026-09-10",
+  "content_hash_algorithm": "sha256",
+  "content_hash": "d6cc49a223bf9143bcfacc4b98fd9628ab599c593f251fd52cf0eceb3461d38e",
+  "tags": [
+    "ambiguity",
+    "business-rule",
+    "canary",
+    "citation",
+    "distractor",
+    "extra-fields",
+    "factual",
+    "forbidden-action",
+    "injection",
+    "isolation",
+    "lexical",
+    "multi-document",
+    "no-answer",
+    "normalization",
+    "refusal",
+    "schema",
+    "semantic-retrieval",
+    "synthesis",
+    "termination",
+    "tool-arguments",
+    "tool-order",
+    "tool-selection"
+  ],
+  "intended_targets": [
+    "fake",
+    "local-http"
+  ],
+  "license": "MIT",
+  "privacy_classification": "synthetic-public"
+}

@@ -46,6 +46,9 @@ extend-exclude = ["*.md"]
 select = ["E", "F", "I", "UP", "B", "SIM", "C4", "PT", "RUF"]
 ignore = ["B008"]
 
+[tool.ruff.lint.per-file-ignores]
+"scripts/*" = ["E501"]
+
 [tool.ruff.format]
 docstring-code-format = true
 

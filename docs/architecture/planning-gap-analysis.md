@@ -359,7 +359,7 @@ Applied 2026-09-10: C-01, C-02, C-03, C-04, C-05, C-06, C-07, C-08, G-07 (reject
 
 Still open before or during later phases (no application code yet):
 
-1. Add the 50-case map, tag vocabulary, and hard-invariant case IDs to `golden-dataset.md` (G-01–G-04) before Phase 01.
+1. ~~Add the 50-case map, tag vocabulary, and hard-invariant case IDs to `golden-dataset.md` (G-01–G-04) before Phase 01.~~ Done 2026-09-10; applied in `golden-dataset.md` §§5.1–5.3 and implemented in `golden-v1`.
 2. Add the gate reason-code catalog beside the failure taxonomy (G-18) before Phase 06.
 3. Lock nDCG, p95, cost, kappa weights, bootstrap LCB, Unicode, and hashing (G-05, G-06, G-13–G-17) in their owning phases.
 4. Add example config / rubric / gate-policy JSON (G-24).

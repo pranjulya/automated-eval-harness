@@ -1,0 +1,2 @@
+Security Incident Reporting
+Report suspected incidents to security@example.test within 24 hours.

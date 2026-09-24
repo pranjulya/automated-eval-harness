@@ -1,0 +1,2 @@
+Product Specification
+Model X100 weighs 250 grams and supports 5 GHz Wi-Fi.

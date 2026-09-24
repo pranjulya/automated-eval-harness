@@ -33,11 +33,11 @@ def test_unknown_command_is_usage_error(capsys: pytest.CaptureFixture[str]) -> N
     assert payload["code"] == "CLI_USAGE"
 
 
-def test_reserved_subcommands_report_owning_phase(capsys: pytest.CaptureFixture[str]) -> None:
-    assert main(["validate", "--suite", "s", "--config", "c"]) == 4
+def test_reserved_subcommands_exit_four(capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["run", "--suite", "s", "--config", "c"]) == 4
     payload = json.loads(capsys.readouterr().err)
     assert payload["code"] == "PHASE_UNAVAILABLE"
-    assert payload["details"]["available_in"] == "Phase 01"
+    assert payload["details"]["available_in"] == "Phase 04"
 
 
 @pytest.mark.parametrize(

@@ -94,6 +94,30 @@ The Pydantic discriminated union narrows `expectation` by `primary_profile`. Unk
 
 The seeded cases must include exact facts, normalization, multi-fact synthesis, ambiguity, expected abstention, injection/canary defense, nested schemas, invalid extra fields, numeric/business constraints, lexical and semantic retrieval, distractors, multi-document evidence, citation validity/correctness/completeness, no-answer, correct tool selection, exact arguments, order, termination, recovery, and forbidden tools.
 
+### 5.1 Case inventory (G-01/G-04)
+
+Every V1 hard invariant is represented by at least one golden. Integrity-hash failure and candidate baseline substitution are run/CI invariants, not golden cases.
+
+**Text / semantic — `text-001`–`text-012`:** exact fact match; Unicode/whitespace normalization; multi-fact synthesis; required concept present; forbidden concept absent; ambiguity clarify/abstain; concise-versus-verbose; numeric/unit normalization; substring/regex expectation; empty/too-short output fails; conflicting instructions (deterministic wins); stable ordering of required values.
+
+**Safety / abstention — `safe-001`–`safe-006`:** missing evidence → `insufficient_evidence`; prohibited disclosure/action; prompt-injection resistance; appropriate refusal; secret canary absent (**hard invariant `HARD_INVARIANT_SECRET_DISCLOSURE`**); false-refusal control (should answer).
+
+**Structured output — `struct-001`–`struct-010`:** nested valid document; wrong type; wrong enum; extra field rejected (**schema-acceptance invariant**); missing required field; numeric range; business constraint assertion; trailing prose forbidden; malformed JSON; array cardinality.
+
+**RAG — `rag-001`–`rag-012`:** lexical retrieval hit; semantic retrieval hit; distractor resistance; multi-document evidence; graded labels for nDCG; Recall@K miss; context truncation/evidence recall; fabricated citation identity (**`HARD_INVARIANT_CITATION_IDENTITY`**); citation completeness; no-answer; cross-collection/tenant leak (**`HARD_INVARIANT_EVIDENCE_BOUNDARY`**); answerable with correct citation.
+
+**Tool use — `tool-001`–`tool-010`:** correct tool selection; exact arguments; subset arguments; order/partial order; maximum steps; repeated-loop detection; recovery after a failed allowed call; forbidden tool/action (**`HARD_INVARIANT_FORBIDDEN_TOOL`**); wrong tool; termination/no extra call.
+
+### 5.2 Closed tag vocabulary (G-02)
+
+The manifest publishes this closed set; unknown tags fail validation:
+
+`factual`, `normalization`, `synthesis`, `ambiguity`, `refusal`, `injection`, `canary`, `schema`, `extra-fields`, `business-rule`, `lexical`, `semantic-retrieval`, `distractor`, `multi-document`, `citation`, `no-answer`, `isolation`, `tool-selection`, `tool-arguments`, `tool-order`, `termination`, `forbidden-action`.
+
+### 5.3 Case ID pattern (G-03)
+
+Every `case_id` matches `^(text|safe|struct|rag|tool)-\d{3}$` and its profile prefix matches `primary_profile`.
+
 ## 6. Labeling workflow
 
 ```mermaid
