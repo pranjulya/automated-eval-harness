@@ -1,6 +1,6 @@
 # Phase 03 — Target Adapters and Normalized Attempts
 
-**Status:** NOT_STARTED
+**Status:** COMPLETE (2026-09-10) — fake and HTTP adapters satisfy one normalized contract; bounded safe retries and attempt preservation tested; `httpx` is the only new dependency.
 
 ## Goal
 
@@ -30,13 +30,13 @@ Read PRD FR-03–06, HLD §§2/8/10, LLD §5. Learn ports/adapters, transport ve
 
 ## Tasks
 
-- [ ] Write shared contract tests for text, structured, evidence/citations, tool traces, usage/latency, timeout, rate limit, target error, and malformed response.
-- [ ] Implement the fake adapter from static case-keyed fixtures; add no network or scoring behavior.
-- [ ] Write retry policy tests for default one attempt, explicit idempotent retry, maximum three, backoff bounds, interruption, and no retry of unsafe/semantic errors.
-- [ ] Implement invocation service with injected clock/sleeper and attempt preservation.
-- [ ] Implement generic HTTP request/response mapping, byte/time limits, redaction hooks, auth header secret reference, and local contract server tests.
-- [ ] Record honest nondeterminism/version capability when the target cannot provide stable model identity or seed behavior.
-- [ ] Document target adapter authoring and why an adapter never decides pass/fail.
+- [x] Write shared contract tests for text, structured, evidence/citations, tool traces, usage/latency, timeout, rate limit, target error, and malformed response.
+- [x] Implement the fake adapter from static case-keyed fixtures; add no network or scoring behavior.
+- [x] Write retry policy tests for default one attempt, explicit idempotent retry, maximum three, backoff bounds, interruption, and no retry of unsafe/semantic errors.
+- [x] Implement invocation service with injected clock/sleeper and attempt preservation.
+- [x] Implement generic HTTP request/response mapping, byte/time limits, redaction hooks, auth header secret reference, and local contract server tests.
+- [x] Record honest nondeterminism/version capability when the target cannot provide stable model identity or seed behavior.
+- [x] Document target adapter authoring and why an adapter never decides pass/fail.
 
 ## Tests and failure scenarios
 
@@ -49,3 +49,11 @@ Run `python -m pytest tests/contract/targets tests/unit/test_invocation.py tests
 ## Acceptance criteria and Definition of Done
 
 Both adapters satisfy one contract, every attempt is preserved, retries are bounded/explicit/safe, normalized output is strict, target identity is reproducible or honestly marked nondeterministic, redaction/limits hold, docs/Learning/review complete, no runner/judge/baseline logic appears, and phase reaches `COMPLETE`.
+
+## Verification evidence (2026-09-10)
+
+- `uv run pytest tests -q --cov=eval_harness` — **233 passed**; coverage **93%** (gate 85%).
+- Contract test runs all 50 fake responses through both adapters and asserts identical `NormalizedOutcome`.
+- Retry tests: default single attempt, idempotent retry to 3, non-idempotent no-retry, malformed not retried, bounded doubling backoff, attempt preservation, interruption propagation.
+- Local HTTP server tests: 200 parity, 429, 500, malformed JSON, oversize, read timeout, missing secret fails closed, secret never echoed.
+- `uv run ruff format --check .` / `uv run ruff check .` / `uv run mypy src/eval_harness` — clean (30 source files).

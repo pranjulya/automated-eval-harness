@@ -1,6 +1,6 @@
 {
   "name": "golden-v1",
-  "suite_version": "1.0.0",
+  "suite_version": "1.0.1",
   "schema_version": "eval.case.v1",
   "case_count": 50,
   "profile_counts": {
@@ -18,7 +18,7 @@
   ],
   "created": "2026-09-10",
   "content_hash_algorithm": "sha256",
-  "content_hash": "d6cc49a223bf9143bcfacc4b98fd9628ab599c593f251fd52cf0eceb3461d38e",
+  "content_hash": "e02461af70b9d050f29a30fc0fde58aa17cc8516cb6d1daac66ff333ffc28572",
   "tags": [
     "ambiguity",
     "business-rule",

@@ -37,7 +37,7 @@ def test_identity_hash_matches_manifest(golden_suite: Path) -> None:
     manifest = json.loads((golden_suite / "manifest.json").read_text(encoding="utf-8"))
     suite = load_suite(golden_suite)
     assert suite.identity.content_hash == manifest["content_hash"]
-    assert suite.identity.suite_version == "1.0.0"
+    assert suite.identity.suite_version == "1.0.1"
     assert suite.identity.schema_version == "eval.case.v1"
 
 
@@ -59,7 +59,7 @@ def test_every_rag_case_is_answerability_consistent(golden_suite: Path) -> None:
 def test_cli_validate_reports_hash(golden_suite: Path, validation_config: Path, capsys) -> None:
     assert main(["validate", "--suite", str(golden_suite), "--config", str(validation_config)]) == 0
     out = capsys.readouterr().out
-    assert "OK golden-v1 1.0.0" in out
+    assert "OK golden-v1 1.0.1" in out
     assert "cases=50" in out
 
 

@@ -53,8 +53,8 @@ All 50 cases are non-sensitive, reviewed, strictly valid, uniquely identified, f
 
 ## Verification evidence (2026-09-10)
 
-- `python -m eval_harness validate --suite evaluation/datasets/golden-v1 --config evaluation/configs/validation.json` → `OK golden-v1 1.0.0 cases=50 hash=d6cc49a2…` exit `0`.
-- Suite hash is idempotent across generator runs and matches `manifest.json`.
+- `python -m eval_harness validate --suite evaluation/datasets/golden-v1 --config evaluation/configs/validation.json` → `OK golden-v1 1.0.1 cases=50 hash=e02461af…` exit `0`.
+- Suite hash is idempotent across generator runs and matches `manifest.json`. `golden-v1` was corrected to 1.0.1 during Phase 03 (see `REVIEW.md`).
 - `uv run pytest tests -q` — **89 passed**; coverage **93%** (gate 85%).
 - `uv run ruff format --check .` and `uv run ruff check .` — clean.
 - `uv run mypy src/eval_harness` — Success: no issues found in 12 source files.
