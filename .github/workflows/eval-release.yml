@@ -1,0 +1,100 @@
+name: eval-release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      decision: ${{ steps.decide.outputs.decision }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.31"
+          enable-cache: true
+      - name: Locked install
+        run: uv sync --extra dev --frozen
+      - name: Deterministic tests
+        run: uv run pytest tests -q --cov=eval_harness --cov-report=term-missing
+      - name: Fetch trusted baseline bundle
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: eval-baseline-bundle
+          path: baseline-store
+      - name: Restore trusted baseline into the artifact root
+        run: |
+          mkdir -p artifacts
+          if [ -d baseline-store/artifacts ]; then
+            cp -R baseline-store/artifacts/. artifacts/
+          fi
+      - name: Run approved 50-case suite
+        run: |
+          uv run python -m eval_harness run \
+            --suite evaluation/datasets/golden-v1 \
+            --config evaluation/configs/fake.json \
+            --run-id "release-${GITHUB_SHA}"
+      - name: Compare to trusted baseline
+        id: decide
+        run: |
+          set +e
+          if [ -f artifacts/baselines/golden-v1/stable.json ]; then
+            uv run python -m eval_harness compare \
+              --candidate "release-${GITHUB_SHA}" --baseline stable --suite golden-v1 \
+              --format json > comparison.json
+            code=$?
+          else
+            echo '{"decision":"REVIEW_REQUIRED","reasons":[{"code":"BASELINE_UNTRUSTED"}]}' > comparison.json
+            code=3
+          fi
+          echo "compare_exit=${code}"
+          cat comparison.json
+          decision=$(python -c "import json;print(json.load(open('comparison.json')).get('decision','REVIEW_REQUIRED'))")
+          reasons=$(python -c "import json;print(','.join(r.get('code','') for r in json.load(open('comparison.json')).get('reasons',[])))")
+          echo "decision=${decision}" >> "$GITHUB_OUTPUT"
+          echo "DECISION=${decision}" >> "$GITHUB_ENV"
+          echo "REASON_CODES=${reasons}" >> "$GITHUB_ENV"
+      - name: Build attestation
+        env:
+          RUN_ID: release-${{ github.sha }}
+        run: uv run python scripts/ci_build_attestation.py
+      - name: Upload evaluation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-evidence
+          path: |
+            artifacts/
+            comparison.json
+            attestation.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  deploy:
+    needs: gate
+    if: needs.gate.outputs.decision == 'PASS'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.31"
+      - run: uv sync --extra dev --frozen
+      - name: Download attestation
+        uses: actions/download-artifact@v4
+        with:
+          name: eval-evidence
+      - name: Verify attestation binds this commit
+        run: |
+          uv run python -m eval_harness verify-attestation \
+            --file attestation.json --commit "${GITHUB_SHA}"
+      - name: Deploy eligible
+        run: echo "PASS attestation verified for ${GITHUB_SHA}; proceed with deployment."

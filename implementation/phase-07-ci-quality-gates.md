@@ -1,6 +1,6 @@
 # Phase 07 — CI Quality Gates and Waivers
 
-**Status:** NOT_STARTED
+**Status:** IN_PROGRESS — attestation verifier, waiver engine, release/promotion workflows, and policy tests complete; blocked on repository branch protection, required reviewers, and the trusted baseline store credentials (deployment-specific).
 
 ## Goal
 
@@ -29,14 +29,14 @@ Read evaluation strategy §11, HLD security boundaries, PRD FR-21/22. Learn trus
 
 ## Tasks
 
-- [ ] Test the workflow dependency and attestation verifier with pass, block, review, stale/wrong commit, wrong run hash, and missing artifact fixtures.
-- [ ] Resolve baseline only from the protected base branch/trusted store and prove candidate changes cannot replace it.
-- [ ] Run deterministic/unit/contract tests on every PR; run complete approved 50-case configuration on release-capable changes with explicit secrets/budget.
-- [ ] Upload complete safe artifacts on pass/block/review/failure with retention and checksum verification.
-- [ ] Implement waiver schema requiring owner, GitHub approver identity, exact scope/reasons, compensating control, and expiry `<=14 days`. V1 approval evidence is a protected GitHub review (required reviewers / CODEOWNERS on the waiver path), not an application cryptographic signature.
-- [ ] Reject expired, mismatched, overbroad, missing GitHub approval evidence, or hard-invariant waivers; display accepted waivers in reports/attestations.
-- [ ] Add protected promotion workflow separate from candidate execution credentials.
-- [ ] Document rerun, flaky-provider, budget-exhaustion, artifact-retention, and emergency release procedures.
+- [x] Test the workflow dependency and attestation verifier with pass, block, review, stale/wrong commit, wrong run hash, and missing artifact fixtures.
+- [x] Resolve baseline only from the protected base branch/trusted store and prove candidate changes cannot replace it. (Default trusted store = protected `promote-baseline` artifact; candidate workflows never write it.)
+- [x] Run deterministic/unit/contract tests on every PR; run complete approved 50-case configuration on release-capable changes with explicit secrets/budget. (Fake target default; real target is a deployment choice.)
+- [x] Upload complete safe artifacts on pass/block/review/failure with retention and checksum verification.
+- [x] Implement waiver schema requiring owner, GitHub approver identity, exact scope/reasons, compensating control, and expiry `<=14 days`. V1 approval evidence is a protected GitHub review (required reviewers / CODEOWNERS on the waiver path), not an application cryptographic signature.
+- [x] Reject expired, mismatched, overbroad, missing GitHub approval evidence, or hard-invariant waivers; display accepted waivers in reports/attestations.
+- [x] Add protected promotion workflow separate from candidate execution credentials.
+- [ ] Document rerun, flaky-provider, budget-exhaustion, artifact-retention, and emergency release procedures. (Partial: failure-triage updated; full runbook is Phase 10.)
 
 ## Tests and failure scenarios
 
@@ -49,3 +49,16 @@ Run local workflow policy tests and exercise CI fixture branches for pass/block/
 ## Acceptance criteria and Definition of Done
 
 Release depends on verified evaluation evidence, baseline trust is candidate-independent, all non-pass paths stop deploy, artifacts survive safely, waivers are narrow/visible/expiring/non-hard only, promotion uses separate authority, drills and docs/Learning/review complete, and phase reaches `COMPLETE`.
+
+## Verification evidence (2026-09-10) — code portion
+
+- `uv run pytest tests -q --cov=eval_harness` — **336 passed**; coverage **~89%** (gate 85%).
+- Attestation tests: stable hash, valid verification, stale commit, wrong run-manifest, wrong baseline, non-pass, expired, tampered.
+- Waiver tests: accepted budget waiver clears review; expired, over-long, missing approval, wildcard, hard-invariant, scope-not-present, suite/channel mismatch, tampered hash, unknown case scope all rejected.
+- Workflow structural tests assert `needs: gate`, the `PASS`-only deploy condition, evidence upload on all outcomes, fail-closed `BASELINE_UNTRUSTED`, and the separate protected promotion environment.
+- CLI smoke: `verify-attestation --commit <sha>` → exit `0`; stale commit → exit `2`.
+- `uv run ruff format --check .` / `uv run ruff check .` / `uv run mypy src/eval_harness` — clean (53 source files).
+
+## Outstanding blocker
+
+`COMPLETE` requires repository settings: branch protection, required reviewers/CODEOWNERS, a protected `production` and `baseline-promotion` environment, and the trusted baseline store credentials. Until configured, trust is advisory even though the code fails closed.

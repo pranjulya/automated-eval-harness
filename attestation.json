@@ -1,0 +1,13 @@
+{
+  "schema_version": "eval.attestation.v1",
+  "commit": "testsha",
+  "run_id": "candidate",
+  "run_manifest_hash": "019c7b3f1ad53c4c1a9ae3e4c206e599f9bea723499074928fe63bba6d133000",
+  "baseline_hash": "ac19dd357c14260079cdf5498d41eed474bd5850494d2cfbf177d041a5ac0f04",
+  "workflow": ".github/workflows/eval-release.yml",
+  "decision": "PASS",
+  "reason_codes": [],
+  "created": "2026-09-24T19:12:46.600350+00:00",
+  "expires_at": "2026-09-25T19:12:46.600350+00:00",
+  "attestation_hash": "822100a0b706339583a5ecae107fc46d2cb2121a34c29db58a9e1214349a1a9a"
+}
