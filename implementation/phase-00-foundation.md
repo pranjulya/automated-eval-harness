@@ -1,6 +1,6 @@
 # Phase 00 — Repository and CLI Foundation
 
-**Status:** NOT_STARTED — specification only; awaiting user approval.
+**Status:** COMPLETE (2026-09-10) — code, tests, lint, types, build, and wheel install verified locally; container build deferred to CI because the local Docker daemon is unavailable (recorded blocker).
 
 ## Goal
 
@@ -32,13 +32,13 @@ Read PRD §§8–9, HLD §§1–2/6, LLD §§1/11/13, and `AGENTS.md`. Learn pac
 
 ## Tasks
 
-- [ ] Add package metadata and only approved direct dependencies; justify each in the PR description.
-- [ ] Test invalid environment/config, secret redaction, CLI help/version, unknown command, and exception-to-exit mapping first.
-- [ ] Implement immutable strict config and errors; CLI subcommands return a documented “not available until phase” usage error without domain behavior.
-- [ ] Add Ruff, strict mypy for the package, pytest configuration, coverage reporting, and build checks.
-- [ ] Add a non-root container that can run help/version and has no embedded credential.
-- [ ] Add CI for locked install, formatting/lint, typing, unit tests, package build, and container build.
-- [ ] Document exact local commands and update the paired learning note.
+- [x] Add package metadata and only approved direct dependencies; justify each in the PR description.
+- [x] Test invalid environment/config, secret redaction, CLI help/version, unknown command, and exception-to-exit mapping first.
+- [x] Implement immutable strict config and errors; CLI subcommands return a documented “not available until phase” usage error without domain behavior.
+- [x] Add Ruff, strict mypy for the package, pytest configuration, coverage reporting, and build checks.
+- [x] Add a non-root container that can run help/version and has no embedded credential.
+- [x] Add CI for locked install, formatting/lint, typing, unit tests, package build, and container build.
+- [x] Document exact local commands and update the paired learning note.
 
 ## Tests and failure scenarios
 
@@ -51,3 +51,14 @@ Run `python -m pytest tests/unit -q`, `ruff format --check .`, `ruff check .`, `
 ## Acceptance criteria and Definition of Done
 
 A clean checkout installs from the lock, help/version are stable, config errors are sanitized, package/container builds pass, CI enforces the same checks, no evaluation/provider/database/queue behavior appears, documentation matches commands, learning note explains boundaries, diff review passes, and phase status reaches `COMPLETE` through the allowed sequence.
+
+## Verification evidence (2026-09-10)
+
+- `uv sync --extra dev --frozen` — locked install from `uv.lock` (Python 3.12.13).
+- `uv run pytest tests/unit -q --cov=eval_harness` — **42 passed**; coverage **94.35%** (gate 85%).
+- `uv run ruff format --check .` — 56 files already formatted.
+- `uv run ruff check .` — All checks passed.
+- `uv run mypy src/eval_harness` — Success: no issues found in 5 source files.
+- `uv run python -m build` — built `eval_harness-0.1.0.tar.gz` and `eval_harness-0.1.0-py3-none-any.whl`.
+- Clean wheel install into a fresh venv: `eval-harness --version` → `eval-harness 0.1.0`; reserved `run` → exit `4`, `PHASE_UNAVAILABLE`.
+- **Blocker:** `docker build` not executed locally — Docker Desktop daemon would not start in this environment. The `.github/workflows/ci.yml` `container` job builds the image and runs `--version`/`--help`; treat container verification as pending until that job runs.

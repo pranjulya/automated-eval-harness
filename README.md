@@ -2,7 +2,29 @@
 
 A planning-first, provider-neutral evaluation system for measuring GenAI quality against a versioned suite of 50 golden cases and blocking regressions before deployment.
 
-No application code exists yet. Start with `Implementation.md`, then read the product, evaluation, and architecture documents before reviewing the phase plans.
+Implementation is underway one phase at a time. Phase 00 provides the installable package, strict configuration, CLI shell, and quality tooling; it contains no evaluation behavior.
+
+## Local development
+
+Requires Python 3.12+ and [`uv`](https://docs.astral.sh/uv/).
+
+```bash
+uv sync --extra dev          # create .venv and install locked dependencies
+uv run pytest tests/unit -q  # unit tests
+uv run ruff format --check .
+uv run ruff check .
+uv run mypy src/eval_harness
+uv run python -m build       # build sdist + wheel
+uv run python -m eval_harness --help
+uv run python -m eval_harness --version
+```
+
+Container (help/version only in Phase 00):
+
+```bash
+docker build -t eval-harness:dev .
+docker run --rm eval-harness:dev --version
+```
 
 ## Planning map
 
@@ -11,8 +33,8 @@ No application code exists yet. Start with `Implementation.md`, then read the pr
 - Golden data contract: `docs/evaluation/golden-dataset.md`
 - Architecture: `docs/architecture/HLD.md`, `docs/architecture/LLD.md`, and `docs/architecture/threat-model.md`
 - Readiness review: `docs/architecture/architecture-review.md`
-- Pre-implementation gap analysis: `docs/architecture/planning-gap-analysis.md` (key locks applied 2026-09-10)
-- Decisions to accept before phases: `docs/architecture/decisions/ADR-candidates.md`
+- Pre-implementation gap analysis: `docs/architecture/planning-gap-analysis.md`
+- Accepted decisions: `docs/architecture/decisions/`
 - Failure triage: `docs/operations/failure-triage.md`
 - Master roadmap: `Implementation.md`
 - Executable phase specifications: `implementation/`

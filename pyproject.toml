@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "eval-harness"
+version = "0.1.0"
+description = "Reproducible, provider-neutral GenAI evaluation harness (Project 07)."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [{ name = "Project 07" }]
+dependencies = [
+    "pydantic>=2.9,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "build>=1.2",
+    "mypy>=1.11",
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "ruff>=0.6",
+]
+
+[project.scripts]
+eval-harness = "eval_harness.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/eval_harness"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra --strict-markers --strict-config"
+testpaths = ["tests"]
+pythonpath = ["src"]
+filterwarnings = ["error"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+extend-exclude = ["*.md"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "C4", "PT", "RUF"]
+ignore = ["B008"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src/eval_harness"]
+warn_unreachable = true
+disallow_any_generics = true
+
+[tool.coverage.run]
+branch = true
+source = ["eval_harness"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 85

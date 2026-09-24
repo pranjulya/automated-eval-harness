@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: use `superpowers:subagent-driven-development` or `superpowers:executing-plans` after user approval. Execute one phase at a time with test-first steps and review gates.
 
-**Status:** APPROVED_FOR_IMPLEMENTATION — planning locks C-01–C-08 applied and ADR-001/ADR-002 accepted 2026-09-10; phases execute one at a time
+**Status:** APPROVED_FOR_IMPLEMENTATION — planning locks C-01–C-08 applied and ADR-001/ADR-002 accepted 2026-09-10; Phase 00 `COMPLETE`, Phases 01–10 execute one at a time
 **Goal:** Build a reproducible, provider-neutral GenAI evaluation harness that scores 50 golden cases, explains failures by capability, and prevents quality regressions from reaching deployment.  
 **Architecture:** A shared Python evaluation core loads immutable dataset/config artifacts, invokes a system under test through a typed adapter, applies deterministic evaluators before optional calibrated judges, writes an immutable run bundle, and compares it with a reviewed baseline. The CLI is authoritative; CI and a later thin authenticated HTTP API call the same services.  
 **Tech stack:** Python 3.12+, standard-library `argparse`, Pydantic v2, HTTPX, pytest, Ruff, mypy, `jsonschema` (Draft 2020-12 structured-output validation in Phase 02 evaluators), FastAPI for the optional service surface, OpenTelemetry, Docker, GitHub Actions. Exact supported versions are locked in Phase 00 after then-current verification. `jsonschema` is added and justified in Phase 02, not Phase 00.  
@@ -150,7 +150,7 @@ Project-07-Automated-Eval-Harness/
 
 | Phase | Deliverable | Depends on | Status |
 |---:|---|---|---|
-| 00 | Repository, contracts, CLI shell, quality tooling | User approval, ADR-001/002 | NOT_STARTED |
+| 00 | Repository, contracts, CLI shell, quality tooling | User approval, ADR-001/002 | COMPLETE |
 | 01 | Golden dataset schema, validation, immutable versioning, 50-case seed | 00, ADR-003 | NOT_STARTED |
 | 02 | Deterministic evaluators and metric library | 01, ADR-004 | NOT_STARTED |
 | 03 | Target adapters, normalized attempts, deterministic fake target | 01, 02 | NOT_STARTED |

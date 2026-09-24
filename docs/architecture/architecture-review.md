@@ -16,7 +16,7 @@ Follow-up findings: `docs/architecture/planning-gap-analysis.md`. Independent re
 
 ## 2. Scope and simplicity
 
-- [x] No application code, scaffold, dependency lock, or deployment config exists.
+- [x] Phase 00 added only the approved package scaffold, dependency lock, container/CI baseline, and CLI shell; no evaluation behavior exists.
 - [x] No custom queue, SQL database, dashboard SPA, workflow engine, plugin marketplace, or hosted tracker is required.
 - [x] `argparse`, JSON/JSONL, hashing, atomic files, and artifact storage are preferred before new infrastructure.
 - [x] RAG/structured/tool support extends evaluator contracts rather than forking the runner.
