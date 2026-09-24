@@ -102,11 +102,11 @@ Failure to meet calibration keeps judge results informational and makes semantic
 
 ## 5. Case decision and aggregation
 
-Each case returns:
+Each completed case returns:
 
 - `PASS` when every required dimension passes;
 - `FAIL` when a deterministic or calibrated semantic requirement fails;
-- `INVALID` when inputs/config are invalid;
+- `CASE_INVALID` when a successfully loaded case or its evaluator input is invalid;
 - `ERROR` when invocation/evaluation cannot complete;
 - `REVIEW_REQUIRED` when evidence is unavailable, uncalibrated, or statistically inconclusive under policy.
 
@@ -114,10 +114,10 @@ The headline `case_pass_rate` is passing cases divided by the 50 expected cases 
 
 Distinguish case state from run status:
 
-- Suite, config, or hash failure aborts before scoring (`DATASET_INVALID` / `CONFIG_INVALID`). Run status is `Invalid`; CLI exit `4`; no quality decision.
+- Suite, config, or hash failure aborts before scoring (`DATASET_INVALID` / `CONFIG_INVALID`). Run status is `Invalid`; CLI exit `4`; no quality decision. `INVALID` is reserved for this run-level status and is never a case result.
 - Missing expected cases, process kill before finalize, or a corrupt/partial bundle makes the run `Incomplete`. Exit `4` (coverage/integrity), `5` (infrastructure), or `130` (SIGINT). No `PASS`, `BLOCK`, or `REVIEW_REQUIRED`.
 - After bounded retries, timeout, rate-limit, or malformed outcome on a case is case state `ERROR`. The run remains completed and comparable; `ERROR` stays in the denominator and cannot satisfy floors.
-- After a successful load, per-case `INVALID` is an internal defect: the run is non-comparable and exits `5`.
+- After a successful load, per-case `CASE_INVALID` is an internal defect: the run is non-comparable and exits `5`.
 
 ## 6. Baseline lifecycle
 
