@@ -12,12 +12,18 @@ import argparse
 import json
 import sys
 from collections.abc import Sequence
+from pathlib import Path
 from typing import NoReturn
+
+from pydantic import ValidationError
 
 from . import __version__
 from .config import AppConfig, load_config
+from .datasets.models import ValidationConfig
+from .datasets.validation import validate_suite
 from .errors import (
     CliUsageError,
+    ConfigError,
     ExitCode,
     HarnessError,
     InfrastructureError,
@@ -30,7 +36,6 @@ __all__ = ["build_parser", "main"]
 
 # command -> owning phase, used for the not-yet-available message.
 _RESERVED_COMMANDS: dict[str, str] = {
-    "validate": "Phase 01",
     "run": "Phase 04",
     "replay": "Phase 04",
     "inspect": "Phase 04",
@@ -54,9 +59,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--version", action="version", version=f"eval-harness {__version__}")
     subparsers = parser.add_subparsers(dest="command", metavar="COMMAND")
 
-    validate = subparsers.add_parser("validate", help="validate a golden suite (Phase 01)")
+    validate = subparsers.add_parser("validate", help="validate a golden suite")
     validate.add_argument("--suite", required=True)
     validate.add_argument("--config", required=True)
+    validate.add_argument("--format", choices=["text", "json"], default="text")
 
     run = subparsers.add_parser("run", help="run an evaluation (Phase 04)")
     run.add_argument("--suite", required=True)
@@ -90,11 +96,47 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _cmd_validate(args: argparse.Namespace, config: AppConfig) -> int:
+    del config  # validation limits come from the validation config file
+    config_path = Path(args.config)
+    try:
+        raw = config_path.read_bytes()
+    except OSError as error:
+        raise ConfigError(
+            "validation config cannot be read",
+            details={"path": str(config_path), "reason": error.strerror or "error"},
+        ) from error
+    try:
+        validation_config = ValidationConfig.model_validate_json(raw)
+    except ValidationError as validation_error:
+        raise ConfigError(
+            "validation config is invalid",
+            details={"path": str(config_path), "errors": validation_error.error_count()},
+        ) from validation_error
+    limits = validation_config.to_limits(config_path.resolve().parent)
+    report = validate_suite(Path(args.suite), limits)
+    if args.format == "json":
+        stream = sys.stdout if report.ok else sys.stderr
+        stream.write(json.dumps(report.to_dict(), sort_keys=True) + "\n")
+    elif report.ok and report.identity is not None:
+        identity = report.identity
+        sys.stdout.write(
+            f"OK {identity.name} {identity.suite_version} "
+            f"cases={len(identity.case_ids)} hash={identity.content_hash}\n"
+        )
+    else:
+        for message in report.errors:
+            sys.stderr.write(message + "\n")
+    return int(ExitCode.SUCCESS) if report.ok else int(ExitCode.INVALID)
+
+
 def _dispatch(args: argparse.Namespace, config: AppConfig) -> int:
     command = args.command
     if command is None:
         build_parser().print_help()
         return int(ExitCode.SUCCESS)
+    if command == "validate":
+        return _cmd_validate(args, config)
     if command in _RESERVED_COMMANDS:
         phase = _RESERVED_COMMANDS[command]
         raise PhaseUnavailableError(

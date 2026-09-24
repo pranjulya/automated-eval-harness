@@ -14,7 +14,9 @@ from typing import Any, Final
 __all__ = [
     "CliUsageError",
     "ConfigError",
+    "DatasetError",
     "ExitCode",
+    "FixtureMissingError",
     "HarnessError",
     "InfrastructureError",
     "InterruptedRunError",
@@ -87,6 +89,19 @@ class ConfigError(HarnessError):
 
     code = "CONFIG_INVALID"
     exit_code = ExitCode.INVALID
+
+
+class DatasetError(HarnessError):
+    """Invalid, incomplete, or tampered dataset. Maps to exit 4."""
+
+    code = "DATASET_INVALID"
+    exit_code = ExitCode.INVALID
+
+
+class FixtureMissingError(DatasetError):
+    """A referenced fixture is missing or escapes the suite root."""
+
+    code = "FIXTURE_MISSING"
 
 
 class CliUsageError(HarnessError):
