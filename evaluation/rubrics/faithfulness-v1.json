@@ -1,0 +1,37 @@
+{
+  "anchors": [
+    {
+      "description": "Not at all; wrong or irrelevant.",
+      "score": 1
+    },
+    {
+      "description": "Mostly missing or misleading.",
+      "score": 2
+    },
+    {
+      "description": "Partially correct; notable gaps or noise.",
+      "score": 3
+    },
+    {
+      "description": "Mostly correct; minor gaps.",
+      "score": 4
+    },
+    {
+      "description": "Fully correct for the stated dimension.",
+      "score": 5
+    }
+  ],
+  "dimension": "faithfulness",
+  "instructions": "Judge only whether every factual claim in the candidate is supported by the provided evidence. Unsupported claims lower the score.",
+  "normalized_map": {
+    "1": 0.0,
+    "2": 0.25,
+    "3": 0.5,
+    "4": 0.75,
+    "5": 1.0
+  },
+  "pass_cut": 0.75,
+  "prompt_hash": "sha256:403df24e80b12aa2d7fabe4e7a1201b8d0db47685fd97bcbd2ea26505da7a7df",
+  "rubric_id": "faithfulness-v1",
+  "version": "1.0.0"
+}

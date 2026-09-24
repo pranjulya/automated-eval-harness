@@ -1,0 +1,37 @@
+{
+  "anchors": [
+    {
+      "description": "Not at all; wrong or irrelevant.",
+      "score": 1
+    },
+    {
+      "description": "Mostly missing or misleading.",
+      "score": 2
+    },
+    {
+      "description": "Partially correct; notable gaps or noise.",
+      "score": 3
+    },
+    {
+      "description": "Mostly correct; minor gaps.",
+      "score": 4
+    },
+    {
+      "description": "Fully correct for the stated dimension.",
+      "score": 5
+    }
+  ],
+  "dimension": "citation_support",
+  "instructions": "Judge only whether each cited evidence identity actually supports the claim it is attached to. Fabricated or mismatched citations lower the score.",
+  "normalized_map": {
+    "1": 0.0,
+    "2": 0.25,
+    "3": 0.5,
+    "4": 0.75,
+    "5": 1.0
+  },
+  "pass_cut": 0.75,
+  "prompt_hash": "sha256:666776986324ee70c48952362fd67490946ccbe5eb77da7b6874697f80397cf9",
+  "rubric_id": "citation-support-v1",
+  "version": "1.0.0"
+}

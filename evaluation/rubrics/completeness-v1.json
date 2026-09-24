@@ -1,0 +1,37 @@
+{
+  "anchors": [
+    {
+      "description": "Not at all; wrong or irrelevant.",
+      "score": 1
+    },
+    {
+      "description": "Mostly missing or misleading.",
+      "score": 2
+    },
+    {
+      "description": "Partially correct; notable gaps or noise.",
+      "score": 3
+    },
+    {
+      "description": "Mostly correct; minor gaps.",
+      "score": 4
+    },
+    {
+      "description": "Fully correct for the stated dimension.",
+      "score": 5
+    }
+  ],
+  "dimension": "completeness",
+  "instructions": "Judge only whether the candidate covers every required part of the reference answer. Extra correct detail does not raise the score.",
+  "normalized_map": {
+    "1": 0.0,
+    "2": 0.25,
+    "3": 0.5,
+    "4": 0.75,
+    "5": 1.0
+  },
+  "pass_cut": 0.75,
+  "prompt_hash": "sha256:d503e5717f493eff00a4c7944de5defc68e4441de5422ea61ac2eb73c70aba40",
+  "rubric_id": "completeness-v1",
+  "version": "1.0.0"
+}

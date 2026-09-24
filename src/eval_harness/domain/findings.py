@@ -95,17 +95,19 @@ def derive_case_state(
     """Derive the case state from findings using the locked precedence.
 
     1. No usable outcome -> ``ERROR``.
-    2. Any failing hard invariant or deterministic finding -> ``FAIL``.
+    2. Any failing hard invariant, deterministic, or semantic finding -> ``FAIL``.
     3. Required semantic evidence unavailable -> ``REVIEW_REQUIRED``.
     4. Otherwise ``PASS``.
 
     ``INVALID`` is reserved for run-level dataset/config failure and is never
     produced here; a per-case invalid after a successful load is a defect.
+    Operational/info findings (for example a judge outage) do not fail a case.
     """
 
     if not outcome_usable:
         return CaseState.ERROR
-    if any(finding.is_failure for finding in findings):
+    failing_severities = {Severity.HARD_INVARIANT, Severity.DETERMINISTIC, Severity.SEMANTIC}
+    if any(finding.is_failure and finding.severity in failing_severities for finding in findings):
         return CaseState.FAIL
     if required_semantic_available is False:
         return CaseState.REVIEW_REQUIRED

@@ -1,0 +1,29 @@
+{
+  "rubric_id": "relevance-v1",
+  "dimension": "relevance",
+  "human": [5, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1],
+  "judge": [5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1],
+  "repeats": [
+    [5, 5, 5], [5, 5, 5], [5, 5, 5], [5, 5, 5],
+    [4, 4, 4], [4, 4, 4], [4, 4, 4], [4, 4, 4],
+    [3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3],
+    [2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2],
+    [1, 1, 2], [1, 1, 1], [1, 1, 1], [1, 2, 1]
+  ],
+  "slices": [
+    "factual", "factual", "factual", "factual", "factual",
+    "factual", "factual", "factual", "factual", "factual",
+    "injection", "injection", "injection", "injection", "injection",
+    "injection", "injection", "injection", "injection", "injection"
+  ],
+  "expected": {
+    "label_count": 20,
+    "pass_count": 8,
+    "fail_count": 12,
+    "weighted_kappa": 0.875,
+    "exact_pass_agreement": 0.95,
+    "repeat_agreement": 0.9,
+    "max_slice_gap": 0.05,
+    "eligible": true
+  }
+}
