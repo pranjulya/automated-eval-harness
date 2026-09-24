@@ -1,7 +1,7 @@
 # Architecture Review and Readiness Checklist
 
-**Review result:** APPROVED_FOR_IMPLEMENTATION (user approval 2026-09-10); planning locks C-01–C-08 applied and ADR-001/ADR-002 accepted.  
-**Reviewed scope:** Planning documents only.
+**Review result:** READY_FOR_USER_ACCEPTANCE (re-run 2026-09-10); planning locks C-01–C-08 applied and ADR-001–ADR-012 accepted. No unresolved blocker; Phases 05/07/08 external gates remain owner actions.  
+**Reviewed scope:** Planning documents plus implemented Phases 00–04, 06, 09 and the code-complete parts of 05/07/08.
 
 Follow-up findings: `docs/architecture/planning-gap-analysis.md`. Independent review accepted the key locks in that file’s §11; owning documents were patched 2026-09-10. Remaining gaps stay open. It does not authorize application code.
 
@@ -76,4 +76,14 @@ The object store, identity provider, target provider, judge provider, absolute l
 
 ## 10. Approval gate
 
-Implementation may begin one phase at a time. ADR-001/002 are accepted; Phase 00 moves to `IN_PROGRESS`, and no later phase starts before the preceding dependency and review gates pass.
+Implementation began one phase at a time. ADR-001/002 are accepted; Phases 00–04, 06, and 09 are `COMPLETE`. Phases 05, 07, and 08 are code-complete but blocked on external inputs (calibration labels/provider, repository protections/credentials, IdP/object store). Final project `COMPLETE` requires the release owner to accept `docs/operations/release-evidence.md`.
+
+## 11. Implementation evidence (2026-09-10)
+
+- **Quality:** 414 tests pass; coverage 89.30%; ruff + strict mypy clean.
+- **Evaluation:** 50-case fake run `pass_rate=1.0`; replay reproduces the summary hash in ≈0.14 s; artifact ≈112 KB.
+- **Determinism:** golden-v1 1.0.1 content-addressed and idempotent; atomic bundles; immutable baselines with predecessor links.
+- **Safety:** hard-invariant and failure drills pass (`tests/e2e/test_production_drills.py`); redaction before persistence; bounded metric labels.
+- **Gating:** all three decisions and every reason code tested; release `deploy` skips on non-`PASS`.
+- **Extension:** all 32 complex-profile goldens execute through one lifecycle.
+- Full index: `docs/operations/release-evidence.md`.

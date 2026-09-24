@@ -59,3 +59,11 @@ Checkpoint: explain citation validity/correctness/completeness and tool selectio
 Run every scenario and answer the interview set. Present one candidate release in ten minutes: manifest, case deltas, hard invariants, semantic uncertainty, cost/latency, decision, artifacts, and remediation.
 
 Final checkpoint: defend no SQL database, dashboard SPA, dynamic plugin loader, automatic golden creation, or judge-only gating in V1—and name the evidence that would justify each later.
+
+## Stage 10 completion — release evidence
+
+Phase 10 turns the path into a release rehearsal. The executable drills are
+`tests/e2e/test_production_drills.py`; the consolidated evidence is
+`docs/operations/release-evidence.md`; the procedure is
+`docs/operations/release-checklist.md`. Work the ten-stage path in order, then
+reproduce the release commands and defend one candidate decision end to end.

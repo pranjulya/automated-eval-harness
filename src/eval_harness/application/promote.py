@@ -32,6 +32,7 @@ class PromotionService:
         authorization: PromotionAuthorization,
         policy_hash: str,
     ) -> BaselineRecord:
+        self._store.read_bundle(run_id)  # verify bundle integrity before promoting
         manifest = self._store.read_manifest(run_id)
         bundle = self._store.run_dir(run_id)
         summary = Summary.model_validate_json((bundle / "summary.json").read_text(encoding="utf-8"))

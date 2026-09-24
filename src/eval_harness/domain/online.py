@@ -53,6 +53,7 @@ _DEFAULT_PATTERNS: tuple[str, ...] = (
     r"Bearer\s+[A-Za-z0-9._-]+",
     r"sk-[A-Za-z0-9]{16,}",
     r"CANARY-[A-Za-z0-9-]+",
+    r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
 )
 
 
