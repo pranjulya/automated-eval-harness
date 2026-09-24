@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: use `superpowers:subagent-driven-development` or `superpowers:executing-plans` after user approval. Execute one phase at a time with test-first steps and review gates.
 
-**Status:** APPROVED_FOR_IMPLEMENTATION — planning locks C-01–C-08 applied and ADR-001/ADR-002 accepted 2026-09-10; Phases 00–04 and 06 `COMPLETE`, Phase 05 code complete (blocked on human labels), Phase 07 code complete (blocked on repo protections/credentials), Phases 08–10 not started
+**Status:** APPROVED_FOR_IMPLEMENTATION — Phases 00–04 and 06 `COMPLETE`; Phase 05 code complete (blocked on human labels); Phase 07 code complete (blocked on repo protections/credentials); Phase 08 code complete (blocked on IdP/object store); Phases 09–10 not started
 **Goal:** Build a reproducible, provider-neutral GenAI evaluation harness that scores 50 golden cases, explains failures by capability, and prevents quality regressions from reaching deployment.  
 **Architecture:** A shared Python evaluation core loads immutable dataset/config artifacts, invokes a system under test through a typed adapter, applies deterministic evaluators before optional calibrated judges, writes an immutable run bundle, and compares it with a reviewed baseline. The CLI is authoritative; CI and a later thin authenticated HTTP API call the same services.  
 **Tech stack:** Python 3.12+, standard-library `argparse`, Pydantic v2, HTTPX, pytest, Ruff, mypy, `jsonschema` (Draft 2020-12 structured-output validation in Phase 02 evaluators), FastAPI for the optional service surface, OpenTelemetry, Docker, GitHub Actions. Exact supported versions are locked in Phase 00 after then-current verification. `jsonschema` is added and justified in Phase 02, not Phase 00.  
@@ -158,7 +158,7 @@ Project-07-Automated-Eval-Harness/
 | 05 | LLM-as-judge rubrics, calibration, reliability controls | 04, ADR-006 | IN_PROGRESS (blocked on human labels) |
 | 06 | Baseline promotion, regression engine, statistics, thresholds | 04, 05, ADR-007 | COMPLETE |
 | 07 | CI quality gates, waivers, clean-container execution | 06, ADR-008 | IN_PROGRESS (blocked on repo protections/credentials) |
-| 08 | Thin authenticated API, observability, security/privacy, online sampling | 07, ADR-009/010 | NOT_STARTED |
+| 08 | Thin authenticated API, observability, security/privacy, online sampling | 07, ADR-009/010 | IN_PROGRESS (blocked on IdP/object store) |
 | 09 | RAG, structured-output, and tool-use extension proof | 02–08 | NOT_STARTED |
 | 10 | Production drills, documentation, learning, final review | 09 | NOT_STARTED |
 
