@@ -1,6 +1,6 @@
 # Phase 10 — Production Drills, Packaging, Documentation, and Learning Release
 
-**Status:** REVIEWED (2026-09-10) — drills, docs, evidence index, and architecture re-run complete; final `COMPLETE` requires release-owner acceptance and the open Phase 05/07/08 external gates.
+**Status:** COMPLETE (2026-09-10) — drills, docs, evidence index, and architecture re-run complete; V1 deterministic core accepted by the owner per ADR-013.
 
 ## Goal
 
@@ -61,8 +61,13 @@ Every project-level DoD item in `Implementation.md` passes with evidence; docs r
 - Architecture review re-run to `READY_FOR_USER_ACCEPTANCE`; evidence index at `docs/operations/release-evidence.md`.
 - `uv run ruff format --check .` / `uv run ruff check .` / `uv run mypy src/eval_harness` — clean.
 
-## Outstanding for final COMPLETE
+## Outcome
 
-- Release-owner acceptance of the evidence index.
-- Deployment-pipeline tasks: dependency/container/secret/license/SBOM scans, live dashboards/alerts, escalation rehearsal.
-- Phase 05 calibration labels/provider, Phase 07 repository protections/credentials, Phase 08 IdP/object store.
+V1 ships the offline deterministic core. Release-owner acceptance was recorded 2026-09-10 (ADR-013).
+
+### Deferred to post-V1 deployment enablement
+
+- Semantic judge gating calibration labels and provider (Phase 05).
+- Repository protections, required reviewers, and trusted-store credentials (Phase 07).
+- Real OIDC issuer/JWKS, production object store, retention/consent values, and dashboards (Phase 08).
+- Deployment-pipeline scans (dependency/container/secret/license/SBOM) and live escalation rehearsals.

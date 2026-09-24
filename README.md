@@ -1,8 +1,8 @@
 # Project 07 — Automated Eval Harness
 
-A planning-first, provider-neutral evaluation system for measuring GenAI quality against a versioned suite of 50 golden cases and blocking regressions before deployment.
+A provider-neutral evaluation system for measuring GenAI quality against a versioned suite of 50 golden cases and blocking regressions before deployment.
 
-Implementation is underway one phase at a time. Phases 00–04 provide the package, strict configuration, CLI, golden dataset, deterministic evaluators, target adapters, the evaluation runner, immutable run bundles, and replay. Judges, baselines, CI gates, the API, and release drills follow.
+**V1 scope (ADR-013):** the offline deterministic core is released — package, strict config, CLI, golden dataset, deterministic evaluators, target adapters, the runner with immutable bundles and replay, the gate engine with baselines/waivers, extension profiles, and the API/telemetry/online-sampling code. Semantic judge gating, repository protections, and the production identity/object-store wiring are deferred to post-V1 deployment enablement; the code for those is shipped and fails closed (`REVIEW_REQUIRED`). See `docs/operations/release-evidence.md`.
 
 ## Local development
 

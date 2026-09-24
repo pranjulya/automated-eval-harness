@@ -2,8 +2,8 @@
 
 **Release candidate:** `main` (Project 07 Automated Eval Harness, V1)
 **Evidence date:** 2026-09-10
-**Overall status:** READY_FOR_USER_ACCEPTANCE — code and deterministic evidence complete;
-Phases 05/07/08 external gates remain open and are listed below.
+**Overall status:** V1_CORE_ACCEPTED (2026-09-10, ADR-013) — the offline deterministic core is released.
+Phases 00–04, 06, 09, and 10 are `COMPLETE`; Phases 05/07/08 are `DEFERRED_POST_V1` and listed below.
 
 Every item links to reproducible commands or committed tests. No paid provider,
 credential, or network is required for the deterministic evidence.
@@ -46,13 +46,13 @@ credential, or network is required for the deterministic evidence.
 - Run bundles atomic (staging → hash index → `COMPLETE` → rename); baselines immutable with predecessor links.
 - Attestations bind commit, run-manifest hash, baseline hash, workflow, decision, and TTL.
 
-## Open items (external, require owner action)
+## Deferred to post-V1 deployment enablement (ADR-013)
 | Item | Phase | Owner action |
 |---|---|---|
 | Judge calibration labels + approved provider | 05 | ≥20 adjudicated labels; select provider; publish `evaluation/calibrations/**` |
-| Branch protection, required reviewers, CI credentials | 07 | Configure repo/environments; then Phase 07 → `COMPLETE` |
-| OIDC issuer/JWKS, object store, retention/consent values | 08 | Select products; wire dashboards; then Phase 08 → `COMPLETE` |
-| Final release acceptance | 10 | Release owner reviews this index and records acceptance |
+| Branch protection, required reviewers, CI credentials | 07 | Configure repo/environments to make the deploy stop non-bypassable |
+| OIDC issuer/JWKS, object store, retention/consent values | 08 | Select products; wire dashboards |
+| Deployment-pipeline scans and escalation rehearsal | 10 | Add dependency/container/secret/license/SBOM scans |
 
 ## Reproduction
 

@@ -1,6 +1,6 @@
 # Phase 08 — API, Observability, Security/Privacy, and Online Signals
 
-**Status:** IN_PROGRESS — API, auth/roles, telemetry bounds, online sampling/quarantine, and local object-store parity complete; blocked on the real identity provider, object store, and retention/consent policy (deployment selections).
+**Status:** DEFERRED_POST_V1 (ADR-013) — API, auth/roles, bounded telemetry, online sampling/quarantine, and local object-store parity shipped; real identity provider, object store, and retention/consent policy deferred.
 
 ## Goal
 

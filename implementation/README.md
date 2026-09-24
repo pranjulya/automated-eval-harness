@@ -1,6 +1,6 @@
 # Implementation phases
 
-**Status:** APPROVED_FOR_IMPLEMENTATION (2026-09-10); phases execute one at a time from Phase 00.
+**Status:** V1_CORE_ACCEPTED (2026-09-10, ADR-013); each phase has a status in its file. Phases 00–04, 06, 09, 10 are `COMPLETE`; Phases 05/07/08 are `DEFERRED_POST_V1`.
 
 Each phase is a specification for one independently reviewable capability. Follow numeric order and do not combine phases to save time.
 

@@ -1,6 +1,6 @@
 # Phase 07 — CI Quality Gates and Waivers
 
-**Status:** IN_PROGRESS — attestation verifier, waiver engine, release/promotion workflows, and policy tests complete; blocked on repository branch protection, required reviewers, and the trusted baseline store credentials (deployment-specific).
+**Status:** DEFERRED_POST_V1 (ADR-013) — attestation verifier, waiver engine, release/promotion workflows, and policy tests shipped and fail-closed; repository branch protection, required reviewers, and trusted-store credentials deferred.
 
 ## Goal
 

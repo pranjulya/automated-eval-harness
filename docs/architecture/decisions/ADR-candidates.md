@@ -17,6 +17,7 @@
 | ADR-010 | Online evaluation/privacy | opt-in sampling, redact before persist, quarantine, human promotion only | ingest all traces; auto-golden/auto-baseline | 08 — ACCEPTED 2026-09-10, TTLs at deployment (`ADR-010-online-evaluation-privacy.md`) |
 | ADR-011 | Extension boundary | first-party discriminated profiles reuse one runner/result/gate lifecycle | dynamic plugin marketplace; profile-specific runners | 09 — ACCEPTED 2026-09-10 (`ADR-011-extension-boundary.md`) |
 | ADR-012 | Nondeterminism | record capability, three release replicates when needed, majority/median aggregation, deterministic replay of outcomes | pretending temperature zero is deterministic | 06 — ACCEPTED 2026-09-10 (`ADR-012-nondeterminism.md`) |
+| ADR-013 | V1 scope | offline deterministic core accepted; deployment enablement deferred (`DEFERRED_POST_V1`) | block release on external inputs; falsely mark blocked phases `COMPLETE` | 10 — ACCEPTED 2026-09-10 (`ADR-013-v1-scope.md`) |
 
 ## Consequences to make explicit
 

@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: use `superpowers:subagent-driven-development` or `superpowers:executing-plans` after user approval. Execute one phase at a time with test-first steps and review gates.
 
-**Status:** REVIEWED_FOR_USER_ACCEPTANCE — Phases 00–04, 06, 09 `COMPLETE`; Phases 05/07/08 code complete (blocked on external labels/protections/IdP); Phase 10 `REVIEWED`. Release evidence: `docs/operations/release-evidence.md`. Project `COMPLETE` pending release-owner acceptance.
+**Status:** V1_CORE_ACCEPTED (2026-09-10) — offline deterministic core released; Phases 00–04, 06, 09, 10 `COMPLETE`; Phases 05/07/08 `DEFERRED_POST_V1` per ADR-013. Release evidence: `docs/operations/release-evidence.md`.
 **Goal:** Build a reproducible, provider-neutral GenAI evaluation harness that scores 50 golden cases, explains failures by capability, and prevents quality regressions from reaching deployment.  
 **Architecture:** A shared Python evaluation core loads immutable dataset/config artifacts, invokes a system under test through a typed adapter, applies deterministic evaluators before optional calibrated judges, writes an immutable run bundle, and compares it with a reviewed baseline. The CLI is authoritative; CI and a later thin authenticated HTTP API call the same services.  
 **Tech stack:** Python 3.12+, standard-library `argparse`, Pydantic v2, HTTPX, pytest, Ruff, mypy, `jsonschema` (Draft 2020-12 structured-output validation in Phase 02 evaluators), FastAPI for the optional service surface, OpenTelemetry, Docker, GitHub Actions. Exact supported versions are locked in Phase 00 after then-current verification. `jsonschema` is added and justified in Phase 02, not Phase 00.  
@@ -155,12 +155,12 @@ Project-07-Automated-Eval-Harness/
 | 02 | Deterministic evaluators and metric library | 01, ADR-004 | COMPLETE |
 | 03 | Target adapters, normalized attempts, deterministic fake target | 01, 02 | COMPLETE |
 | 04 | Evaluation runner, run bundles, reports, experiment comparison | 02, 03, ADR-005 | COMPLETE |
-| 05 | LLM-as-judge rubrics, calibration, reliability controls | 04, ADR-006 | IN_PROGRESS (blocked on human labels) |
+| 05 | LLM-as-judge rubrics, calibration, reliability controls | 04, ADR-006 | DEFERRED_POST_V1 (ADR-013) |
 | 06 | Baseline promotion, regression engine, statistics, thresholds | 04, 05, ADR-007 | COMPLETE |
-| 07 | CI quality gates, waivers, clean-container execution | 06, ADR-008 | IN_PROGRESS (blocked on repo protections/credentials) |
-| 08 | Thin authenticated API, observability, security/privacy, online sampling | 07, ADR-009/010 | IN_PROGRESS (blocked on IdP/object store) |
+| 07 | CI quality gates, waivers, clean-container execution | 06, ADR-008 | DEFERRED_POST_V1 (ADR-013) |
+| 08 | Thin authenticated API, observability, security/privacy, online sampling | 07, ADR-009/010 | DEFERRED_POST_V1 (ADR-013) |
 | 09 | RAG, structured-output, and tool-use extension proof | 02–08 | COMPLETE |
-| 10 | Production drills, documentation, learning, final review | 09 | REVIEWED (awaiting user acceptance) |
+| 10 | Production drills, documentation, learning, final review | 09 | COMPLETE (V1-core acceptance 2026-09-10) |
 
 ## 13. Phase dependency map
 
@@ -230,16 +230,24 @@ Required before relevant phases: artifact-first persistence, CLI-first boundary,
 
 ## 19. Final Definition of Done
 
-- Exactly 50 `golden-v1` cases validate and cover all five primary profiles with the locked distribution.
-- A clean, documented command runs the suite, writes a complete run bundle, and returns stable exit codes.
-- Deterministic metrics match hand calculations; calibrated semantic evaluation exposes uncertainty and failure.
-- `PASS`, `BLOCK`, and `REVIEW_REQUIRED` paths work; unresolved block/review prevents deployment.
-- Baseline promotion is explicit, immutable, authorized, and auditable.
-- Replaying normalized outcomes reproduces scores without provider calls.
-- Versioning covers dataset, case schema, target, prompt, model, tool/schema, evaluator, judge/rubric, dependencies, and environment.
-- CI, containers, security/privacy checks, telemetry, failure drills, and artifact recovery pass.
-- RAG, structured-output, and tool-use extension profiles work through the shared runner.
-- Architecture review has no unresolved blocker, all phase statuses are accurate, Learning material is complete, and the user accepts the result.
+### V1 core (accepted 2026-09-10, ADR-013)
+
+- [x] Exactly 50 `golden-v1` cases validate and cover all five primary profiles with the locked distribution.
+- [x] A clean, documented command runs the suite, writes a complete run bundle, and returns stable exit codes.
+- [x] Deterministic metrics match hand calculations; deterministic failures and uncertainty are exposed.
+- [x] `PASS`, `BLOCK`, and `REVIEW_REQUIRED` paths work; unresolved block/review prevents deployment when CI enforcement is configured.
+- [x] Baseline promotion is explicit, immutable, authorized, and auditable.
+- [x] Replaying normalized outcomes reproduces scores without provider calls.
+- [x] Versioning covers dataset, case schema, target, prompt, model, tool/schema, evaluator, judge/rubric, dependencies, and environment.
+- [x] Containers, failure/security drills, and artifact recovery pass; telemetry is bounded and safe.
+- [x] RAG, structured-output, and tool-use extension profiles work through the shared runner.
+- [x] Architecture review has no unresolved blocker, all phase statuses are accurate, Learning material is complete, and the owner accepted the V1 core.
+
+### Deferred to post-V1 deployment enablement (ADR-013)
+
+- [ ] Calibrated semantic judge gating (calibrated semantic scores influencing the gate).
+- [ ] Repository protections, required reviewers, and CI trusted-store credentials.
+- [ ] Real OIDC issuer/JWKS, production object store, retention/consent values, and dashboards.
 
 ## 20. Change control
 
