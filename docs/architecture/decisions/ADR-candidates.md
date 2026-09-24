@@ -8,7 +8,7 @@
 | ADR-001 | Runtime and packaging | Python 3.12+, `src/` package, Pydantic v2, pytest/Ruff/mypy | polyglot runtime; framework-heavy scaffold | 00 — ACCEPTED 2026-09-10 (`ADR-001-runtime-and-packaging.md`) |
 | ADR-002 | User entry point | standard-library `argparse` CLI is authoritative; FastAPI later wraps services | Typer/Click dependency; API-first; notebook authority | 00 — ACCEPTED 2026-09-10 (`ADR-002-cli-entry-point.md`) |
 | ADR-003 | Golden data/versioning | strict JSONL cases + JSON manifest/checksums, SHA-256 identity, immutable versions | mutable spreadsheets; executable YAML/templates; database-only labels | 01 — ACCEPTED 2026-09-10 (`ADR-003-golden-data-versioning.md`) |
-| ADR-004 | Scoring model | deterministic hard/contract/profile evaluators first; explicit profile registry; `jsonschema` Draft 2020-12 in the structured evaluator | one opaque composite score; judge-only evaluation; ad-hoc JSON parsers | 02 |
+| ADR-004 | Scoring model | deterministic hard/contract/profile evaluators first; explicit profile registry; `jsonschema` Draft 2020-12 in the structured evaluator | one opaque composite score; judge-only evaluation; ad-hoc JSON parsers | 02 — ACCEPTED 2026-09-10 (`ADR-004-scoring-model.md`) |
 | ADR-005 | Persistence/experiments | immutable run bundles on filesystem/object store; no SQL or hosted tracker required | PostgreSQL/MLflow from day one | 04 |
 | ADR-006 | Semantic judging | rubric-specific, structured, calibrated judge with human agreement thresholds | “is this good?” judge; majority of uncalibrated judges | 05 |
 | ADR-007 | Regression policy | absolute floors + paired case non-regression + paired bootstrap non-inferiority; `REVIEW_REQUIRED` blocks deploy | aggregate-only threshold; p-value-only decision | 06 |

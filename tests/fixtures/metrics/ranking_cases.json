@@ -1,0 +1,57 @@
+[
+  {
+    "name": "perfect_topk",
+    "retrieved": ["d1", "d2", "d2", "d3", "d4"],
+    "relevant": ["d1", "d3"],
+    "grades": {"d1": 2, "d3": 1},
+    "k": 3,
+    "recall_at_k": 1.0,
+    "precision_at_k": 0.6666666666666666,
+    "mrr": 1.0,
+    "ndcg_at_k": 0.9639404333166532
+  },
+  {
+    "name": "late_hit",
+    "retrieved": ["x", "d3", "d1"],
+    "relevant": ["d1"],
+    "grades": {"d1": 2},
+    "k": 3,
+    "recall_at_k": 1.0,
+    "precision_at_k": 0.3333333333333333,
+    "mrr": 0.3333333333333333,
+    "ndcg_at_k": 0.5
+  },
+  {
+    "name": "empty_retrieval",
+    "retrieved": [],
+    "relevant": ["d1"],
+    "grades": {"d1": 2},
+    "k": 5,
+    "recall_at_k": 0.0,
+    "precision_at_k": 0.0,
+    "mrr": 0.0,
+    "ndcg_at_k": 0.0
+  },
+  {
+    "name": "no_labels",
+    "retrieved": ["d1"],
+    "relevant": [],
+    "grades": {},
+    "k": 5,
+    "recall_at_k": null,
+    "precision_at_k": 0.0,
+    "mrr": 0.0,
+    "ndcg_at_k": null
+  },
+  {
+    "name": "short_list",
+    "retrieved": ["d1"],
+    "relevant": ["d1", "d9"],
+    "grades": {"d1": 2, "d9": 1},
+    "k": 3,
+    "recall_at_k": 0.5,
+    "precision_at_k": 0.3333333333333333,
+    "mrr": 1.0,
+    "ndcg_at_k": 0.8262346571285599
+  }
+]
