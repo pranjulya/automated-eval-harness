@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema:order-nested-v1",
+  "type": "object",
+  "properties": {
+    "order": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "string"},
+        "total": {"type": "number"},
+        "status": {"type": "string", "enum": ["new", "paid", "shipped"]},
+        "quantity": {"type": "integer"},
+        "items": {"type": "array"}
+      },
+      "required": ["id", "total", "status", "quantity", "items"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["order"],
+  "additionalProperties": false
+}
