@@ -75,6 +75,8 @@ sequenceDiagram
     CLI-->>User: summary and stable exit code
 ```
 
+**C-06 lock (run versus compare):** a Phase 04 `run` is exploratory: it writes an immutable bundle but no `comparison.json` and claims no release eligibility. Baseline comparison is added in Phase 06, where `run --baseline CHANNEL` and `compare --candidate --baseline` both call the same comparison service and write `comparison.json`. The sequence above shows the completed (Phase 06) release path.
+
 ## 4. Artifact architecture
 
 ```text

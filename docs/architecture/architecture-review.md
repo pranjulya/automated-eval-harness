@@ -1,6 +1,6 @@
 # Architecture Review and Readiness Checklist
 
-**Review result:** READY_FOR_USER_REVIEW; NOT APPROVED_FOR_IMPLEMENTATION  
+**Review result:** APPROVED_FOR_IMPLEMENTATION (user approval 2026-09-10); planning locks C-01–C-08 applied and ADR-001/ADR-002 accepted.  
 **Reviewed scope:** Planning documents only.
 
 Follow-up findings: `docs/architecture/planning-gap-analysis.md`. Independent review accepted the key locks in that file’s §11; owning documents were patched 2026-09-10. Remaining gaps stay open. It does not authorize application code.
@@ -76,4 +76,4 @@ The object store, identity provider, target provider, judge provider, absolute l
 
 ## 10. Approval gate
 
-Implementation may begin only after the user approves this package. Then ADR-001/002 are accepted or revised, Phase 00 moves to `IN_PROGRESS`, and no later phase starts before the preceding dependency and review gates pass.
+Implementation may begin one phase at a time. ADR-001/002 are accepted; Phase 00 moves to `IN_PROGRESS`, and no later phase starts before the preceding dependency and review gates pass.

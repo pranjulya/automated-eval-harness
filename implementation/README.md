@@ -1,6 +1,6 @@
 # Implementation phases
 
-**Status:** PLANNING_COMPLETE; all phases `NOT_STARTED`; user approval precedes Phase 00.
+**Status:** APPROVED_FOR_IMPLEMENTATION (2026-09-10); phases execute one at a time from Phase 00.
 
 Each phase is a specification for one independently reviewable capability. Follow numeric order and do not combine phases to save time.
 

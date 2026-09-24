@@ -1,6 +1,6 @@
 # Planning Gap Analysis — Pre-Implementation Findings
 
-**Status:** KEY_LOCKS_APPLIED — independent review accepted the items in §11; owning docs patched 2026-09-10. Still not an ADR and not authorization to write application code.  
+**Status:** ALL_KEY_LOCKS_APPLIED — C-01 through C-08 and the named gaps are closed in their owning documents; ADR-001 and ADR-002 accepted 2026-09-10. Still not an ADR and not authorization to write application code; user approval of the package is the remaining gate.  
 **Date:** 2026-09-09 (locks applied 2026-09-10)  
 **Author:** Grok planning audit  
 **Audience:** Independent reviewer (including Codex). Remaining open gaps in §2 still need later-phase locks. Do not start application code from this list.
@@ -355,7 +355,7 @@ These remain PRD non-goals. Reject review comments that introduce them.
 
 ## 9. Remaining planning-only work
 
-Applied 2026-09-10: C-01, C-02, C-03, C-04, C-07, C-08, G-07 (rejected/replaced), G-08, G-27, LICENSE, git/gitignore/tmux cleanup.
+Applied 2026-09-10: C-01, C-02, C-03, C-04, C-05, C-06, C-07, C-08, G-07 (rejected/replaced), G-08, G-27, LICENSE, git/gitignore/tmux cleanup, ADR template, accepted ADR-001/ADR-002.
 
 Still open before or during later phases (no application code yet):
 
@@ -364,7 +364,7 @@ Still open before or during later phases (no application code yet):
 3. Lock nDCG, p95, cost, kappa weights, bootstrap LCB, Unicode, and hashing (G-05, G-06, G-13–G-17) in their owning phases.
 4. Add example config / rubric / gate-policy JSON (G-24).
 5. Accept or revise ADR-001 and ADR-002 as dated records before Phase 00.
-6. Leave ADR-003–012 as candidates until their phases. C-05/C-06 remain documented; only the waiver-signature part of C-05 is applied.
+6. Leave ADR-003–012 as candidates until their phases. C-05 and C-06 are now applied (ADR-001/002 accepted; baseline/compare locks recorded in HLD/LLD/Phase 04/06).
 
 ---
 
@@ -377,8 +377,8 @@ C-01 Precision@K: accept — divide by K
 C-02 Exit 130: accept — added to PRD FR-13
 C-03 ERROR vs Incomplete: accept — applied
 C-04 INVALID denominator: accept — applied
-C-05 Signature vs hash: revise — GitHub evidence in Phase 07; app signatures in Phase 08
-C-06 run vs compare: not in this review pass
+C-05 Signature vs hash: accept — SHA-256 + trusted resolution; GitHub evidence in Phase 07; app signatures in Phase 08
+C-06 run vs compare: accept — Phase 04 exploratory; Phase 06 run --baseline + compare
 C-07 Learning create vs update: accept — Phase 09 updates existing file
 C-08 Phase 03 depends on 02: accept — roadmap, diagram, Phase 03
 G-07 Regex: reject as written — trusted repo patterns only; no re timeout

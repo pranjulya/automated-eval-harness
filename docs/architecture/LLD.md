@@ -173,7 +173,7 @@ Candidate/baseline identities, compatibility checks, changed variables, paired c
 
 ### `BaselineRecord`
 
-Suite/channel, immutable run and config hashes, gate-policy hash, approver identity, reason, creation time, superseded pointer hash, and optional signature.
+Suite/channel, immutable run and config hashes, gate-policy hash, approver identity, reason, creation time, and superseded pointer hash. **C-05 lock:** V1 identity is the SHA-256 hash of the record plus trusted base-branch/trusted-store resolution. V1 does not require an application cryptographic signature; promotion/waiver approvals use protected GitHub review evidence (Phase 07), and signing arrives only with the Phase 08 identity provider.
 
 ## 9. Artifact publication
 

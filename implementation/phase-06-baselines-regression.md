@@ -9,6 +9,7 @@ Implement explicit baseline promotion, compatibility checks, absolute/profile ga
 ## Prerequisites and decisions
 
 Phase 04 `COMPLETE`; Phase 05 `COMPLETE` for semantic gating; ADR-007 and ADR-012 accepted; the absolute target latency SLO chosen for the reference deployment before promotion.
+**C-06 lock:** this phase owns baseline comparison. Add `run --baseline CHANNEL` (same comparison service, writes `comparison.json`) and `compare --candidate --baseline`; Phase 04 `run` stays exploratory.
 
 ## References and concepts
 

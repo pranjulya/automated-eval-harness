@@ -9,6 +9,7 @@ Connect validated suites, target invocation, deterministic evaluators, atomic ru
 ## Prerequisites and decisions
 
 Phases 02 and 03 `COMPLETE`; ADR-005 accepted; filesystem artifact root and retention for local/CI runs approved.
+**C-06 lock:** this phase writes exploratory bundles only. Do not read or write a baseline and do not emit `comparison.json`; baseline comparison is Phase 06.
 
 ## References and concepts
 
