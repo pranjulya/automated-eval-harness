@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.31"
+          enable-cache: true
+      - name: Locked install
+        run: uv sync --extra dev --frozen
+      - name: Format check
+        run: uv run ruff format --check .
+      - name: Lint
+        run: uv run ruff check .
+      - name: Type check
+        run: uv run mypy src/eval_harness
+      - name: Tests
+        run: uv run pytest tests -q --cov=eval_harness --cov-report=term-missing
+      - name: Build package
+        run: uv run python -m build
+
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t eval-harness:ci .
+      - name: Help/version smoke
+        run: |
+          docker run --rm eval-harness:ci --version
+          docker run --rm eval-harness:ci --help

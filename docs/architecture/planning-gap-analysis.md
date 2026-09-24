@@ -27,7 +27,7 @@ Record findings as accept / revise / reject per numbered item. Do not start appl
 | Decisions | `docs/architecture/decisions/ADR-candidates.md` only | Not accepted |
 | Phases 00–10 | Specs only | All `NOT_STARTED` |
 | Learning | 10 concepts, 5 scenarios, interview Q&A | Outline-level |
-| Application code | None | Correct until user approval |
+| Application code | Phase 00 package scaffold, strict config, CLI shell, tooling | Approved; no evaluation behavior |
 | Dataset / configs / rubrics / baselines | None | Phase 01+ |
 | Git | `origin/main` at GitHub `pranjulya/automated-eval-harness` | Present; dirty-flag provenance still requires a clean Phase 00 CLI |
 
