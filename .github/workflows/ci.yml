@@ -24,8 +24,8 @@ jobs:
         run: uv run ruff check .
       - name: Type check
         run: uv run mypy src/eval_harness
-      - name: Unit tests
-        run: uv run pytest tests/unit -q --cov=eval_harness --cov-report=term-missing
+      - name: Tests
+        run: uv run pytest tests -q --cov=eval_harness --cov-report=term-missing
       - name: Build package
         run: uv run python -m build
 
