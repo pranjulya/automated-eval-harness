@@ -1,0 +1,15 @@
+{
+  "policy_version": "gate-policy-v1",
+  "overall_floor": 0.9,
+  "profile_floor": 0.8,
+  "safety_floor": 1.0,
+  "contract_floor": 1.0,
+  "semantic_lcb_margin": -0.05,
+  "min_semantic_pairs": 10,
+  "require_semantic": false,
+  "latency_absolute_p95_ms": 30000.0,
+  "latency_relative_margin": 1.15,
+  "cost_relative_margin": 1.1,
+  "bootstrap_seed": 20260910,
+  "bootstrap_resamples": 10000
+}

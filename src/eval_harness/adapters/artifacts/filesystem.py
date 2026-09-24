@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from ...datasets.hashing import canonical_json, hash_file, sha256_hex
+from ...domain.baselines import BaselineRecord
 from ...domain.runs import RUN_SCHEMA_VERSION, BundleIndex, RunManifest
 from ...errors import InfrastructureError
 
@@ -85,11 +86,27 @@ def _write_text(path: Path, text: str) -> None:
         os.fsync(handle.fileno())
 
 
+def _atomic_write_bytes(path: Path, data: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.tmp-{sha256_hex(os.urandom(8))[:8]}")
+    try:
+        with temporary.open("wb") as handle:
+            handle.write(data)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        if temporary.exists():
+            temporary.unlink(missing_ok=True)
+
+
 class FilesystemArtifactStore:
     def __init__(self, root: Path) -> None:
         self.root = Path(root)
         self.runs = self.root / "runs"
+        self.baselines = self.root / "baselines"
         self.runs.mkdir(parents=True, exist_ok=True)
+        self.baselines.mkdir(parents=True, exist_ok=True)
 
     def run_dir(self, run_id: str) -> Path:
         return self.runs / run_id
@@ -135,3 +152,39 @@ class FilesystemArtifactStore:
         return RunManifest.model_validate_json(
             (bundle / "manifest.json").read_text(encoding="utf-8")
         )
+
+    # --- Baselines -------------------------------------------------------
+
+    def _baseline_dir(self, suite_name: str) -> Path:
+        return self.baselines / suite_name
+
+    def baseline_path(self, suite_name: str, channel: str) -> Path:
+        return self._baseline_dir(suite_name) / f"{channel}.json"
+
+    def baseline_exists(self, suite_name: str, channel: str) -> bool:
+        return self.baseline_path(suite_name, channel).is_file()
+
+    def read_baseline(self, suite_name: str, channel: str) -> BaselineRecord:
+        path = self.baseline_path(suite_name, channel)
+        if not path.is_file():
+            raise InfrastructureError(
+                "baseline channel does not exist",
+                details={"suite": suite_name, "channel": channel},
+            )
+        return BaselineRecord.model_validate_json(path.read_text(encoding="utf-8"))
+
+    def write_baseline(self, record: BaselineRecord) -> None:
+        directory = self._baseline_dir(record.suite_name)
+        history = directory / "history" / record.channel
+        history.mkdir(parents=True, exist_ok=True)
+        immutable = history / f"{record.record_hash}.json"
+        payload = canonical_json(record.model_dump(mode="json"))
+        if not immutable.exists():
+            _atomic_write_bytes(immutable, payload)
+        _atomic_write_bytes(self.baseline_path(record.suite_name, record.channel), payload)
+
+    def list_baseline_channels(self, suite_name: str) -> list[str]:
+        directory = self._baseline_dir(suite_name)
+        if not directory.is_dir():
+            return []
+        return sorted(path.stem for path in directory.glob("*.json") if path.is_file())

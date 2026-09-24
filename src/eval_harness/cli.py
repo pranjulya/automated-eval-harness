@@ -20,12 +20,16 @@ from pydantic import ValidationError
 from . import __version__
 from .adapters.artifacts.filesystem import FilesystemArtifactStore
 from .adapters.targets import FakeTargetAdapter, HttpTargetAdapter, load_fake_responses
+from .application.compare import CompareService, load_policy
+from .application.promote import PromotionService
 from .application.replay import ReplayService
 from .application.run import RunConfig, RunRequest, RunService
 from .config import AppConfig, load_config
 from .datasets.models import ValidationConfig
 from .datasets.validation import validate_suite
+from .domain.baselines import PromotionAuthorization
 from .domain.cases import Profile
+from .domain.gates import Comparison, GateDecision
 from .domain.runs import CodeIdentity, Summary
 from .errors import (
     CliUsageError,
@@ -41,10 +45,7 @@ from .evaluators import build_registry, load_schema_resolver
 
 __all__ = ["build_parser", "main"]
 
-_RESERVED_COMMANDS: dict[str, str] = {
-    "compare": "Phase 06",
-    "promote-baseline": "Phase 06",
-}
+_RESERVED_COMMANDS: dict[str, str] = {}
 
 
 class _ArgumentParser(argparse.ArgumentParser):
@@ -84,18 +85,22 @@ def build_parser() -> argparse.ArgumentParser:
     inspect.add_argument("--failures-only", action="store_true")
     inspect.add_argument("--format", choices=["text", "json"], default="text")
 
-    compare = subparsers.add_parser("compare", help="compare to a baseline (Phase 06)")
+    compare = subparsers.add_parser("compare", help="compare a candidate run to a baseline")
     compare.add_argument("--candidate", required=True)
-    compare.add_argument("--baseline", required=True)
+    compare.add_argument("--baseline", required=True, help="baseline channel")
+    compare.add_argument("--suite", required=True)
+    compare.add_argument("--policy", default="evaluation/configs/gate-policy-v1.json")
+    compare.add_argument("--format", choices=["text", "json"], default="text")
 
     promote = subparsers.add_parser(
-        "promote-baseline", help="promote a reviewed baseline (Phase 06)"
+        "promote-baseline", help="promote a reviewed run to a baseline channel"
     )
     promote.add_argument("--run", required=True)
     promote.add_argument("--suite", required=True)
     promote.add_argument("--channel", required=True)
     promote.add_argument("--reason", required=True)
     promote.add_argument("--approval-file", required=True)
+    promote.add_argument("--policy", default="evaluation/configs/gate-policy-v1.json")
 
     return parser
 
@@ -267,6 +272,69 @@ def _cmd_inspect(args: argparse.Namespace, config: AppConfig) -> int:
     return int(ExitCode.SUCCESS)
 
 
+_DECISION_EXIT: dict[GateDecision, ExitCode] = {
+    GateDecision.PASS: ExitCode.SUCCESS,
+    GateDecision.BLOCK: ExitCode.BLOCK,
+    GateDecision.REVIEW_REQUIRED: ExitCode.REVIEW_REQUIRED,
+}
+
+
+def _cmd_compare(args: argparse.Namespace, config: AppConfig) -> int:
+    store = FilesystemArtifactStore(config.artifact_root)
+    policy = load_policy(Path(args.policy))
+    comparison: Comparison = CompareService(store).compare(
+        args.candidate, args.suite, args.baseline, policy
+    )
+    if args.format == "json":
+        sys.stdout.write(json.dumps(comparison.model_dump(mode="json"), sort_keys=True) + "\n")
+    else:
+        reason_codes = ",".join(reason.code for reason in comparison.reasons) or "none"
+        sys.stdout.write(
+            f"COMPARE candidate={comparison.candidate_run_id} "
+            f"baseline={comparison.baseline_run_id} comparable={comparison.comparable} "
+            f"decision={comparison.decision} reasons={reason_codes}\n"
+        )
+    if not comparison.comparable:
+        return int(ExitCode.INVALID)
+    return int(_DECISION_EXIT[comparison.decision])
+
+
+def _load_authorization(path: Path) -> PromotionAuthorization:
+    try:
+        raw = path.read_bytes()
+    except OSError as error:
+        raise ConfigError("approval file cannot be read", details={"path": str(path)}) from error
+    try:
+        payload = json.loads(raw)
+    except ValueError as error:
+        raise ConfigError("approval file is not valid JSON", details={"path": str(path)}) from error
+    if not isinstance(payload, dict):
+        raise ConfigError("approval file must be a JSON object", details={"path": str(path)})
+    try:
+        return PromotionAuthorization.model_validate(payload)
+    except ValidationError as validation_error:
+        raise ConfigError(
+            "approval file is invalid",
+            details={"path": str(path), "errors": validation_error.error_count()},
+        ) from validation_error
+
+
+def _cmd_promote(args: argparse.Namespace, config: AppConfig) -> int:
+    store = FilesystemArtifactStore(config.artifact_root)
+    policy = load_policy(Path(args.policy))
+    authorization = _load_authorization(Path(args.approval_file)).model_copy(
+        update={"reason": args.reason}
+    )
+    record = PromotionService(store).promote(
+        args.run, args.suite, args.channel, authorization, policy.policy_hash()
+    )
+    sys.stdout.write(
+        f"BASELINE suite={record.suite_name} channel={record.channel} "
+        f"run={record.run_id} hash={record.record_hash}\n"
+    )
+    return int(ExitCode.SUCCESS)
+
+
 def _dispatch(args: argparse.Namespace, config: AppConfig) -> int:
     command = args.command
     if command is None:
@@ -280,6 +348,10 @@ def _dispatch(args: argparse.Namespace, config: AppConfig) -> int:
         return _cmd_replay(args, config)
     if command == "inspect":
         return _cmd_inspect(args, config)
+    if command == "compare":
+        return _cmd_compare(args, config)
+    if command == "promote-baseline":
+        return _cmd_promote(args, config)
     if command in _RESERVED_COMMANDS:
         phase = _RESERVED_COMMANDS[command]
         raise PhaseUnavailableError(

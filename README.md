@@ -25,6 +25,11 @@ uv run python -m eval_harness run \
   --suite evaluation/datasets/golden-v1 --config evaluation/configs/fake.json
 uv run python -m eval_harness replay --run <RUN_ID>
 uv run python -m eval_harness inspect --run <RUN_ID> --failures-only
+
+# Promote a reviewed run to a baseline channel, then compare a candidate
+uv run python -m eval_harness promote-baseline --run <RUN_ID> --suite golden-v1 \
+  --channel stable --reason "initial review" --approval-file approval.json
+uv run python -m eval_harness compare --candidate <RUN_ID> --baseline stable --suite golden-v1
 ```
 
 Runs are written under `EVAL_HARNESS_ARTIFACT_ROOT` (default `./artifacts/runs/<run-id>`).

@@ -33,42 +33,16 @@ def test_unknown_command_is_usage_error(capsys: pytest.CaptureFixture[str]) -> N
     assert payload["code"] == "CLI_USAGE"
 
 
-def test_reserved_subcommands_exit_four(capsys: pytest.CaptureFixture[str]) -> None:
+def test_compare_requires_suite_argument(capsys: pytest.CaptureFixture[str]) -> None:
     assert main(["compare", "--candidate", "c", "--baseline", "b"]) == 4
     payload = json.loads(capsys.readouterr().err)
-    assert payload["code"] == "PHASE_UNAVAILABLE"
-    assert payload["details"]["available_in"] == "Phase 06"
+    assert payload["code"] == "CLI_USAGE"
 
 
-@pytest.mark.parametrize(
-    ("command", "phase"),
-    [
-        ("compare", "Phase 06"),
-        ("promote-baseline", "Phase 06"),
-    ],
-)
-def test_reserved_command_phase_mapping(
-    command: str, phase: str, capsys: pytest.CaptureFixture[str]
-) -> None:
-    argv = {
-        "compare": ["compare", "--candidate", "c", "--baseline", "b"],
-        "promote-baseline": [
-            "promote-baseline",
-            "--run",
-            "r",
-            "--suite",
-            "s",
-            "--channel",
-            "ch",
-            "--reason",
-            "why",
-            "--approval-file",
-            "f",
-        ],
-    }[command]
-    assert main(argv) == 4
+def test_promote_requires_approval_file(capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["promote-baseline", "--run", "r", "--suite", "s", "--channel", "c"]) == 4
     payload = json.loads(capsys.readouterr().err)
-    assert payload["details"]["available_in"] == phase
+    assert payload["code"] == "CLI_USAGE"
 
 
 def test_missing_required_argument_is_usage_error(capsys: pytest.CaptureFixture[str]) -> None:

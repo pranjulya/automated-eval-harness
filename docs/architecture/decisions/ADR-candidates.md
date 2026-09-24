@@ -11,12 +11,12 @@
 | ADR-004 | Scoring model | deterministic hard/contract/profile evaluators first; explicit profile registry; `jsonschema` Draft 2020-12 in the structured evaluator | one opaque composite score; judge-only evaluation; ad-hoc JSON parsers | 02 — ACCEPTED 2026-09-10 (`ADR-004-scoring-model.md`) |
 | ADR-005 | Persistence/experiments | immutable run bundles on filesystem/object store; no SQL or hosted tracker required | PostgreSQL/MLflow from day one | 04 — ACCEPTED 2026-09-10 (`ADR-005-persistence-experiments.md`) |
 | ADR-006 | Semantic judging | rubric-specific, structured, calibrated judge with human agreement thresholds | “is this good?” judge; majority of uncalibrated judges | 05 — ACCEPTED 2026-09-10, implementation gated on human labels (`ADR-006-semantic-judging.md`) |
-| ADR-007 | Regression policy | absolute floors + paired case non-regression + paired bootstrap non-inferiority; `REVIEW_REQUIRED` blocks deploy | aggregate-only threshold; p-value-only decision | 06 |
+| ADR-007 | Regression policy | absolute floors + paired case non-regression + paired bootstrap non-inferiority; `REVIEW_REQUIRED` blocks deploy | aggregate-only threshold; p-value-only decision | 06 — ACCEPTED 2026-09-10 (`ADR-007-regression-policy.md`) |
 | ADR-008 | CI and waivers | trusted base-branch baseline, stable exit codes, immutable artifacts, scoped expiring waiver with protected GitHub approval evidence; hard invariants non-waivable | candidate-owned baseline; permanent ignore list; app signatures before an IdP exists | 07 |
 | ADR-009 | HTTP/service scope | read-mostly FastAPI wrapper and protected promotions; platform job runner if needed | custom distributed queue/dashboard SPA | 08 |
 | ADR-010 | Online evaluation/privacy | opt-in sampling, redact before persist, quarantine, human promotion only | ingest all traces; auto-golden/auto-baseline | 08 |
 | ADR-011 | Extension boundary | first-party discriminated profiles reuse one runner/result/gate lifecycle | dynamic plugin marketplace; profile-specific runners | 09 |
-| ADR-012 | Nondeterminism | record capability, three release replicates when needed, majority/median aggregation, deterministic replay of outcomes | pretending temperature zero is deterministic | 06 |
+| ADR-012 | Nondeterminism | record capability, three release replicates when needed, majority/median aggregation, deterministic replay of outcomes | pretending temperature zero is deterministic | 06 — ACCEPTED 2026-09-10 (`ADR-012-nondeterminism.md`) |
 
 ## Consequences to make explicit
 

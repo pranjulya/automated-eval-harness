@@ -1,6 +1,6 @@
 # Phase 06 — Baselines, Regression Gates, and Statistics
 
-**Status:** NOT_STARTED
+**Status:** COMPLETE (2026-09-10) — ordered gate engine, immutable baselines, paired bootstrap, and all three decisions verified against fake-target runs.
 
 ## Goal
 
@@ -31,15 +31,15 @@ Read evaluation strategy §§6–8 and LLD §10. Learn baselines versus targets,
 
 ## Tasks
 
-- [ ] Write compatibility tests for suite/case/schema/evaluator/rubric/calibration/target-policy hashes and complete full-suite coverage.
-- [ ] Implement immutable baseline record and explicit promotion with authorization evidence, predecessor link, atomic pointer update, and no implicit promotion.
-- [ ] Write fail-first gate fixtures for each hard invariant, 45/50 boundary, each profile 80% boundary, 100% contract/safety, total/profile/new deterministic regression, and decision precedence.
-- [ ] Implement ordered pure gate engine with complete reason evidence.
-- [ ] Write exact paired bootstrap tests with injected seed, constant/empty/ineligible samples, known deltas, and reproducible 10,000 resamples.
-- [ ] Implement non-inferiority and repeated-run majority/median aggregation without claiming external determinism.
-- [ ] Add latency/cost absolute/relative budget tests and unavailable-data review behavior.
-- [ ] Run/triage repeated reference executions and promote the first baseline only after every failure is reviewed.
-- [ ] Wire compare/promotion CLI, reports, and audit-friendly baseline history.
+- [x] Write compatibility tests for suite/case/schema/evaluator/rubric/calibration/target-policy hashes and complete full-suite coverage.
+- [x] Implement immutable baseline record and explicit promotion with authorization evidence, predecessor link, atomic pointer update, and no implicit promotion.
+- [x] Write fail-first gate fixtures for each hard invariant, 45/50 boundary, each profile 80% boundary, 100% contract/safety, total/profile/new deterministic regression, and decision precedence.
+- [x] Implement ordered pure gate engine with complete reason evidence.
+- [x] Write exact paired bootstrap tests with injected seed, constant/empty/ineligible samples, known deltas, and reproducible 10,000 resamples.
+- [x] Implement non-inferiority and repeated-run majority/median aggregation without claiming external determinism.
+- [x] Add latency/cost absolute/relative budget tests and unavailable-data review behavior.
+- [x] Run/triage repeated reference executions and promote the first baseline only after every failure is reviewed. (Fake-target reference runs; real reference target is a deployment choice.)
+- [x] Wire compare/promotion CLI, reports, and audit-friendly baseline history.
 
 ## Tests and failure scenarios
 
@@ -52,3 +52,11 @@ Run Phase 06 unit/integration/E2E tests and all earlier checks. Execute fixture 
 ## Acceptance criteria and Definition of Done
 
 Promotion is explicit/protected/immutable, comparisons are paired and compatible, every documented threshold and uncertainty path is tested, a new deterministic failure always blocks, 50-case limitations are visible, all three decisions/exit codes work, the first baseline has review evidence, docs/Learning/review complete, and phase reaches `COMPLETE`.
+
+## Verification evidence (2026-09-10)
+
+- `uv run pytest tests -q --cov=eval_harness` — **312 passed**; coverage **90%** (gate 85%).
+- Gate tests cover every reason code, the 0.90 / 0.80 / 1.00 boundaries, provenance, regression (total/profile/new case), budgets, incompatibility, changed variables, and `BLOCK` precedence.
+- Bootstrap tests: seeded reproducibility, zero-variance, empty, mismatched length, positive/negative effects, and 10,000-resample default.
+- CLI smoke: `run` → `promote-baseline` → `run` → `compare` returns `decision=PASS` exit `0`; e2e produces `PASS`/`BLOCK`/`REVIEW_REQUIRED`.
+- `uv run ruff format --check .` / `uv run ruff check .` / `uv run mypy src/eval_harness` — clean (51 source files).
