@@ -126,6 +126,8 @@ class ComparisonRun(_Model):
 class Comparison(_Model):
     candidate_run_id: str
     baseline_run_id: str
+    suite_name: str = ""
+    channel: str = ""
     comparable: bool
     compatibility_failures: tuple[str, ...] = ()
     decision: GateDecision
@@ -136,6 +138,7 @@ class Comparison(_Model):
     latency_delta_pct: float | None = None
     cost_delta_pct: float | None = None
     changed_variables: tuple[str, ...] = ()
+    accepted_waivers: tuple[str, ...] = ()
 
 
 def _reason(

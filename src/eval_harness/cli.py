@@ -20,17 +20,19 @@ from pydantic import ValidationError
 from . import __version__
 from .adapters.artifacts.filesystem import FilesystemArtifactStore
 from .adapters.targets import FakeTargetAdapter, HttpTargetAdapter, load_fake_responses
-from .application.compare import CompareService, load_policy
+from .application.compare import CompareService, load_policy, load_waiver
 from .application.promote import PromotionService
 from .application.replay import ReplayService
 from .application.run import RunConfig, RunRequest, RunService
 from .config import AppConfig, load_config
 from .datasets.models import ValidationConfig
 from .datasets.validation import validate_suite
+from .domain.attestations import GateAttestation, compute_attestation_hash, verify_attestation
 from .domain.baselines import PromotionAuthorization
 from .domain.cases import Profile
 from .domain.gates import Comparison, GateDecision
 from .domain.runs import CodeIdentity, Summary
+from .domain.waivers import apply_waivers
 from .errors import (
     CliUsageError,
     ConfigError,
@@ -90,7 +92,17 @@ def build_parser() -> argparse.ArgumentParser:
     compare.add_argument("--baseline", required=True, help="baseline channel")
     compare.add_argument("--suite", required=True)
     compare.add_argument("--policy", default="evaluation/configs/gate-policy-v1.json")
+    compare.add_argument("--waiver", action="append", help="waiver JSON file (repeatable)")
     compare.add_argument("--format", choices=["text", "json"], default="text")
+
+    verify = subparsers.add_parser(
+        "verify-attestation", help="verify a gate attestation before deploy"
+    )
+    verify.add_argument("--file", required=True)
+    verify.add_argument("--commit")
+    verify.add_argument("--run-manifest-hash")
+    verify.add_argument("--baseline-hash")
+    verify.add_argument("--allow-expired", action="store_true")
 
     promote = subparsers.add_parser(
         "promote-baseline", help="promote a reviewed run to a baseline channel"
@@ -285,6 +297,17 @@ def _cmd_compare(args: argparse.Namespace, config: AppConfig) -> int:
     comparison: Comparison = CompareService(store).compare(
         args.candidate, args.suite, args.baseline, policy
     )
+    suppressed: tuple[str, ...] = ()
+    if args.waiver:
+        waivers = tuple(load_waiver(Path(path)) for path in args.waiver)
+        comparison, decisions = apply_waivers(comparison, waivers)
+        for decision in decisions:
+            if decision.accepted:
+                suppressed = suppressed + decision.suppressed_reasons
+            else:
+                sys.stderr.write(
+                    f"waiver {decision.waiver_id} rejected: {','.join(decision.failures)}\n"
+                )
     if args.format == "json":
         sys.stdout.write(json.dumps(comparison.model_dump(mode="json"), sort_keys=True) + "\n")
     else:
@@ -294,9 +317,46 @@ def _cmd_compare(args: argparse.Namespace, config: AppConfig) -> int:
             f"baseline={comparison.baseline_run_id} comparable={comparison.comparable} "
             f"decision={comparison.decision} reasons={reason_codes}\n"
         )
+        if comparison.accepted_waivers:
+            sys.stdout.write(
+                f"WAIVERS accepted={','.join(comparison.accepted_waivers)} "
+                f"suppressed={','.join(sorted(set(suppressed))) or 'none'}\n"
+            )
     if not comparison.comparable:
         return int(ExitCode.INVALID)
     return int(_DECISION_EXIT[comparison.decision])
+
+
+def _cmd_verify_attestation(args: argparse.Namespace, config: AppConfig) -> int:
+    del config
+    path = Path(args.file)
+    try:
+        payload = path.read_bytes()
+    except OSError as error:
+        raise ConfigError("attestation file cannot be read", details={"path": str(path)}) from error
+    try:
+        attestation = GateAttestation.model_validate_json(payload)
+    except ValidationError as validation_error:
+        raise ConfigError(
+            "attestation file is invalid",
+            details={"path": str(path), "errors": validation_error.error_count()},
+        ) from validation_error
+    result = verify_attestation(
+        attestation,
+        expected_commit=args.commit,
+        expected_run_manifest_hash=args.run_manifest_hash,
+        expected_baseline_hash=args.baseline_hash,
+        allow_expired=args.allow_expired,
+    )
+    payload_out = {
+        "ok": result.ok,
+        "failures": list(result.failures),
+        "decision": str(attestation.decision),
+        "commit": attestation.commit,
+        "attestation_hash": compute_attestation_hash(attestation),
+    }
+    sys.stdout.write(json.dumps(payload_out, sort_keys=True) + "\n")
+    return int(ExitCode.SUCCESS) if result.ok else int(ExitCode.BLOCK)
 
 
 def _load_authorization(path: Path) -> PromotionAuthorization:
@@ -352,6 +412,8 @@ def _dispatch(args: argparse.Namespace, config: AppConfig) -> int:
         return _cmd_compare(args, config)
     if command == "promote-baseline":
         return _cmd_promote(args, config)
+    if command == "verify-attestation":
+        return _cmd_verify_attestation(args, config)
     if command in _RESERVED_COMMANDS:
         phase = _RESERVED_COMMANDS[command]
         raise PhaseUnavailableError(

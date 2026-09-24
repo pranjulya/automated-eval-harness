@@ -11,6 +11,7 @@ from typing import Any
 from ...datasets.hashing import canonical_json, hash_file, sha256_hex
 from ...domain.baselines import BaselineRecord
 from ...domain.runs import RUN_SCHEMA_VERSION, BundleIndex, RunManifest
+from ...domain.waivers import Waiver
 from ...errors import InfrastructureError
 
 __all__ = ["FilesystemArtifactStore", "RunWriter"]
@@ -105,8 +106,10 @@ class FilesystemArtifactStore:
         self.root = Path(root)
         self.runs = self.root / "runs"
         self.baselines = self.root / "baselines"
+        self.waivers = self.root / "waivers"
         self.runs.mkdir(parents=True, exist_ok=True)
         self.baselines.mkdir(parents=True, exist_ok=True)
+        self.waivers.mkdir(parents=True, exist_ok=True)
 
     def run_dir(self, run_id: str) -> Path:
         return self.runs / run_id
@@ -188,3 +191,22 @@ class FilesystemArtifactStore:
         if not directory.is_dir():
             return []
         return sorted(path.stem for path in directory.glob("*.json") if path.is_file())
+
+    # --- Waivers ---------------------------------------------------------
+
+    def waiver_path(self, waiver_id: str) -> Path:
+        return self.waivers / f"{waiver_id}.json"
+
+    def write_waiver(self, waiver: Waiver) -> None:
+        _atomic_write_bytes(
+            self.waiver_path(waiver.waiver_id), canonical_json(waiver.model_dump(mode="json"))
+        )
+
+    def read_waiver(self, waiver_id: str) -> Waiver:
+        path = self.waiver_path(waiver_id)
+        if not path.is_file():
+            raise InfrastructureError("waiver does not exist", details={"waiver_id": waiver_id})
+        return Waiver.model_validate_json(path.read_text(encoding="utf-8"))
+
+    def list_waivers(self) -> list[str]:
+        return sorted(path.stem for path in self.waivers.glob("*.json") if path.is_file())

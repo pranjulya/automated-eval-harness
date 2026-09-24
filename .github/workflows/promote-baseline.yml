@@ -1,0 +1,60 @@
+name: promote-baseline
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Run ID to promote (from the eval-release gate)"
+        required: true
+      suite:
+        description: "Suite name"
+        required: true
+        default: "golden-v1"
+      channel:
+        description: "Baseline channel"
+        required: true
+        default: "stable"
+      reason:
+        description: "Reviewer reason for promotion"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    # Requires a protected environment with required reviewers (configured in
+    # repository settings). This is separate authority from candidate execution.
+    environment: baseline-promotion
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.31"
+          enable-cache: true
+      - run: uv sync --extra dev --frozen
+      - name: Download the reviewed run bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: eval-evidence
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: downloaded
+      - name: Promote with protected approval evidence
+        run: |
+          mkdir -p artifacts
+          cp -R downloaded/artifacts/. artifacts/
+          cat > approval.json <<EOF
+          {"actor": "${{ github.actor }}", "approval_evidence": ["github:${GITHUB_REPOSITORY}/actions/runs/${{ inputs.run_id }}"], "reason": "${{ inputs.reason }}"}
+          EOF
+          uv run python -m eval_harness promote-baseline \
+            --run "${{ inputs.run_id }}" --suite "${{ inputs.suite }}" \
+            --channel "${{ inputs.channel }}" --reason "${{ inputs.reason }}" \
+            --approval-file approval.json
+      - name: Publish baseline bundle for the gate
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-baseline-bundle
+          path: artifacts/
+          retention-days: 90

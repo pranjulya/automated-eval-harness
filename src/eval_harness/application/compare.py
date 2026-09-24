@@ -9,8 +9,9 @@ from ..adapters.artifacts.filesystem import FilesystemArtifactStore
 from ..datasets.hashing import hash_file
 from ..domain.gates import Comparison, ComparisonRun, GatePolicy, compare_runs
 from ..domain.runs import CaseResult, Summary
+from ..domain.waivers import Waiver
 
-__all__ = ["CompareService", "load_comparison_run"]
+__all__ = ["CompareService", "load_comparison_run", "load_policy"]
 
 
 def load_comparison_run(store: FilesystemArtifactStore, run_id: str) -> ComparisonRun:
@@ -50,8 +51,13 @@ class CompareService:
         candidate = load_comparison_run(self._store, candidate_run_id)
         record = self._store.read_baseline(suite_name, channel)
         baseline = load_comparison_run(self._store, record.run_id)
-        return compare_runs(candidate, baseline, policy)
+        comparison = compare_runs(candidate, baseline, policy)
+        return comparison.model_copy(update={"suite_name": suite_name, "channel": channel})
 
 
 def load_policy(path: Path) -> GatePolicy:
     return GatePolicy.model_validate_json(path.read_text(encoding="utf-8"))
+
+
+def load_waiver(path: Path) -> Waiver:
+    return Waiver.model_validate_json(path.read_text(encoding="utf-8"))

@@ -46,7 +46,7 @@ Every non-pass records run/case IDs, first failing layer, failure code, candidat
 
 ## 4. Waiver policy
 
-A waiver is allowed only for listed non-hard quality or operational reasons. It names exact suite/config/cases/reason codes, owner, approver, justification, compensating control, and expiry no later than 14 days. It is visible in reports and telemetry. Hard invariants, integrity failures, candidate-controlled baselines, secret disclosures, forbidden actions, and cross-boundary evidence leakage are not waivable in V1.
+A waiver is allowed only for listed non-hard quality or operational reasons. It names exact suite/channel/reason codes/cases, owner, GitHub approver identity and approval evidence, justification, compensating control, and expiry no later than 14 days. An accepted waiver suppresses only its eligible reason codes and is visible in reports and telemetry. Hard invariants, integrity failures, candidate-controlled baselines, secret disclosures, forbidden actions, and cross-boundary evidence leakage are not waivable in V1. Default trusted baseline store: the artifact produced by the protected `promote-baseline` workflow; upgrade to the Phase 08 object store. Non-pass decisions skip the `deploy` job, which also re-verifies the attestation with `verify-attestation`.
 
 ## 5. Recovery drills
 
