@@ -14,6 +14,7 @@ from .base import Evaluator, SchemaResolver
 from .invariants import InvariantEvaluator
 from .rag import RagEvaluator
 from .safety import SafetyEvaluator
+from .schema_store import load_schema_resolver
 from .structured import StructuredEvaluator
 from .text import TextEvaluator
 from .tools import ToolEvaluator
@@ -25,6 +26,7 @@ __all__ = [
     "build_registry",
     "case_state",
     "evaluate_case",
+    "load_schema_resolver",
 ]
 
 INVARIANT_EVALUATORS: tuple[Evaluator, ...] = (InvariantEvaluator(),)

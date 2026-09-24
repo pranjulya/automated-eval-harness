@@ -34,18 +34,15 @@ def test_unknown_command_is_usage_error(capsys: pytest.CaptureFixture[str]) -> N
 
 
 def test_reserved_subcommands_exit_four(capsys: pytest.CaptureFixture[str]) -> None:
-    assert main(["run", "--suite", "s", "--config", "c"]) == 4
+    assert main(["compare", "--candidate", "c", "--baseline", "b"]) == 4
     payload = json.loads(capsys.readouterr().err)
     assert payload["code"] == "PHASE_UNAVAILABLE"
-    assert payload["details"]["available_in"] == "Phase 04"
+    assert payload["details"]["available_in"] == "Phase 06"
 
 
 @pytest.mark.parametrize(
     ("command", "phase"),
     [
-        ("run", "Phase 04"),
-        ("replay", "Phase 04"),
-        ("inspect", "Phase 04"),
         ("compare", "Phase 06"),
         ("promote-baseline", "Phase 06"),
     ],
@@ -54,9 +51,6 @@ def test_reserved_command_phase_mapping(
     command: str, phase: str, capsys: pytest.CaptureFixture[str]
 ) -> None:
     argv = {
-        "run": ["run", "--suite", "s", "--config", "c"],
-        "replay": ["replay", "--run", "r"],
-        "inspect": ["inspect", "--run", "r"],
         "compare": ["compare", "--candidate", "c", "--baseline", "b"],
         "promote-baseline": [
             "promote-baseline",
