@@ -364,7 +364,7 @@ def build_cases() -> list[dict]:
             ["schema", "extra-fields"],
             "Return the document without extra fields.",
             "schema:order-nested-v1",
-            [{"pointer": "/order", "op": "length", "value": 3}],
+            [{"pointer": "/order/id", "op": "exists"}],
             rationale="Hard invariant: schema acceptance rejects extra fields.",
         ),
         structured(
@@ -702,7 +702,7 @@ def write_suite() -> None:
 
     manifest = {
         "name": "golden-v1",
-        "suite_version": "1.0.0",
+        "suite_version": "1.0.1",
         "schema_version": "eval.case.v1",
         "case_count": len(cases),
         "profile_counts": profile_counts,

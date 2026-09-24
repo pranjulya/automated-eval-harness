@@ -1,6 +1,6 @@
 # golden-v1 Review Record
 
-**Suite:** `golden-v1` 1.0.0  
+**Suite:** `golden-v1` 1.0.1  
 **Schema:** `eval.case.v1`  
 **Content hash:** computed and stored in `manifest.json`; recomputed by `validate`.  
 **Privacy classification:** `synthetic-public`  
@@ -42,3 +42,8 @@
 Published suites are immutable. To correct a case, publish a new `suite_version`, update
 `manifest.json` and `checksums.json`, and record the reason here. Historic runs remain
 readable under their original content hash.
+
+- **1.0.1 (2026-09-10):** corrected `struct-004`. Its JSON Pointer assertion required
+  `/order` to have length 3 while the referenced schema requires five fields. Replaced the
+  assertion with `/order/id` existence; extra-field rejection is enforced by the schema's
+  `additionalProperties: false` under the `HARD_INVARIANT_SCHEMA` check. No other case changed.
