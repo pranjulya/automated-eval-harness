@@ -16,4 +16,4 @@ htmlcov/
 
 # Local environment and artifacts
 .env
-artifacts/
+/artifacts/
