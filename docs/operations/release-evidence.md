@@ -53,6 +53,7 @@ credential, or network is required for the deterministic evidence.
 | Branch protection, required reviewers, CI credentials | 07 | Configure repo/environments to make the deploy stop non-bypassable |
 | OIDC issuer/JWKS, object store, retention/consent values | 08 | Select products; wire dashboards |
 | Deployment-pipeline scans and escalation rehearsal | 10 | Add dependency/container/secret/license/SBOM scans |
+| HTTP API `serve` command + `uvicorn` | 08 | Add an ASGI entry point so the API can be run and curl-tested locally |
 
 ## Reproduction
 

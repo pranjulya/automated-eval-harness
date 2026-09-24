@@ -42,3 +42,10 @@
 
 - `GET /health/live` — process liveness.
 - `GET /health/ready` — artifact-store reachability (`artifacts: true|false`).
+
+## Not yet available locally
+
+- The API is code-complete and tested via `TestClient`, but there is **no
+  `eval-harness serve` command and no `uvicorn` dependency** yet, so a local
+  `curl` smoke test is not possible until that is added (Phase 08 follow-up).
+  See `docs/operations/local-quickstart.md`.

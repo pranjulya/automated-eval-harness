@@ -54,6 +54,7 @@ docker run --rm eval-harness:dev --version
 - Failure triage: `docs/operations/failure-triage.md`
 - CLI/API reference: `docs/operations/cli-api-reference.md`
 - Service runbook: `docs/operations/service-runbook.md`
+- Local run quickstart (not yet run): `docs/operations/local-quickstart.md`
 - Release checklist: `docs/operations/release-checklist.md`
 - Release evidence index: `docs/operations/release-evidence.md`
 - Master roadmap: `Implementation.md`
