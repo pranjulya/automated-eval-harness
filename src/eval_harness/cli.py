@@ -9,9 +9,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from collections.abc import Sequence
+from datetime import timedelta
 from pathlib import Path
 from typing import Any, NoReturn
 
@@ -20,11 +22,13 @@ from pydantic import ValidationError
 from . import __version__
 from .adapters.artifacts.filesystem import FilesystemArtifactStore
 from .adapters.targets import FakeTargetAdapter, HttpTargetAdapter, load_fake_responses
+from .api_auth import HmacJwtVerifier, Role, issue_hs256_token
 from .application.compare import CompareService, load_policy, load_waiver
+from .application.online import InMemorySampleStore, OnlineSampler
 from .application.promote import PromotionService
 from .application.replay import ReplayService
 from .application.run import RunConfig, RunRequest, RunService
-from .config import AppConfig, load_config
+from .config import JWT_SECRET_ENV, AppConfig, Environment, load_config
 from .datasets.models import ValidationConfig
 from .datasets.validation import validate_suite
 from .domain.attestations import GateAttestation, compute_attestation_hash, verify_attestation
@@ -114,7 +118,99 @@ def build_parser() -> argparse.ArgumentParser:
     promote.add_argument("--approval-file", required=True)
     promote.add_argument("--policy", default="evaluation/configs/gate-policy-v1.json")
 
+    serve = subparsers.add_parser(
+        "serve", help="serve the HTTP API over the same application services as the CLI"
+    )
+    serve.add_argument("--config", required=True, help="run config used by POST /v1/runs")
+    serve.add_argument("--policy", default="evaluation/configs/gate-policy-v1.json")
+    serve.add_argument("--host", default="127.0.0.1")
+    serve.add_argument("--port", type=int, default=8080)
+
+    token = subparsers.add_parser(
+        "dev-token", help="mint a local HS256 API token (refused in production)"
+    )
+    token.add_argument("--actor", required=True)
+    token.add_argument(
+        "--role",
+        action="append",
+        required=True,
+        choices=[role.value for role in Role],
+        help="repeatable",
+    )
+    token.add_argument("--tenant", default="default")
+    token.add_argument("--ttl-minutes", type=int, default=60)
+
     return parser
+
+
+_MIN_JWT_SECRET_BYTES = 32
+
+
+def _jwt_secret() -> str:
+    secret = os.environ.get(JWT_SECRET_ENV, "")
+    if len(secret.encode("utf-8")) < _MIN_JWT_SECRET_BYTES:
+        raise ConfigError(
+            "API token secret is missing or too short",
+            details={"env": JWT_SECRET_ENV, "min_bytes": _MIN_JWT_SECRET_BYTES},
+        )
+    return secret
+
+
+def build_service_app(
+    config: AppConfig, run_config_path: Path, policy_path: Path, secret: str
+) -> tuple[Any, Any]:
+    """Wire the API to the CLI's own services. Returns ``(app, adapter)``; close the adapter."""
+    from .api import create_app
+
+    run_config = _load_run_config(run_config_path)
+    run_config = run_config.model_copy(update={"artifact_root": str(config.artifact_root)})
+    config.ensure_artifact_root()
+    store = FilesystemArtifactStore(config.artifact_root)
+    adapter = _build_adapter(run_config)
+    run_service = RunService(
+        adapter=adapter,
+        registry=build_registry(_schema_resolver(Path.cwd())),
+        code=_code_identity(),
+        environment=config.environment.value,
+    )
+    app = create_app(
+        store=store,
+        run_service=run_service,
+        compare_service=CompareService(store),
+        promotion_service=PromotionService(store),
+        verifier=HmacJwtVerifier(secret),
+        sampler=OnlineSampler(InMemorySampleStore()),
+        policy=load_policy(policy_path),
+        default_run_config=run_config,
+    )
+    return app, adapter
+
+
+def _cmd_serve(args: argparse.Namespace, config: AppConfig) -> int:
+    import uvicorn
+
+    app, adapter = build_service_app(config, Path(args.config), Path(args.policy), _jwt_secret())
+    try:
+        uvicorn.run(app, host=args.host, port=args.port, log_level=config.log_level.value.lower())
+    finally:
+        _close_adapter(adapter)
+    return int(ExitCode.SUCCESS)
+
+
+def _cmd_dev_token(args: argparse.Namespace, config: AppConfig) -> int:
+    if config.environment is Environment.PRODUCTION:
+        raise ConfigError("dev-token is disabled in production; use the identity provider")
+    if args.ttl_minutes <= 0:
+        raise CliUsageError("--ttl-minutes must be positive")
+    token = issue_hs256_token(
+        _jwt_secret(),
+        actor=args.actor,
+        roles=[Role(role) for role in args.role],
+        tenant=args.tenant,
+        ttl=timedelta(minutes=args.ttl_minutes),
+    )
+    sys.stdout.write(token + "\n")
+    return int(ExitCode.SUCCESS)
 
 
 def _load_run_config(path: Path) -> RunConfig:
@@ -414,6 +510,10 @@ def _dispatch(args: argparse.Namespace, config: AppConfig) -> int:
         return _cmd_promote(args, config)
     if command == "verify-attestation":
         return _cmd_verify_attestation(args, config)
+    if command == "serve":
+        return _cmd_serve(args, config)
+    if command == "dev-token":
+        return _cmd_dev_token(args, config)
     if command in _RESERVED_COMMANDS:
         phase = _RESERVED_COMMANDS[command]
         raise PhaseUnavailableError(
