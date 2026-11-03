@@ -16,10 +16,14 @@ eval-harness inspect    --run RUN_ID [--failures-only] [--format text|json]
 eval-harness compare    --candidate RUN_ID --baseline CHANNEL --suite NAME [--policy PATH] [--waiver FILE ...] [--format text|json]
 eval-harness promote-baseline --run RUN_ID --suite NAME --channel NAME --reason TEXT --approval-file PATH [--policy PATH]
 eval-harness verify-attestation --file PATH [--commit SHA] [--run-manifest-hash H] [--baseline-hash H] [--allow-expired]
+eval-harness serve      --config PATH [--policy PATH] [--host 127.0.0.1] [--port 8080]
+eval-harness dev-token  --actor NAME --role ROLE [--role ROLE ...] [--tenant T] [--ttl-minutes N]
 eval-harness --version | --help
 ```
 
-Environment: `EVAL_HARNESS_ENVIRONMENT`, `EVAL_HARNESS_LOG_LEVEL`, `EVAL_HARNESS_ARTIFACT_ROOT`, `EVAL_HARNESS_SECRET_REFS`. Secrets are referenced by environment-variable name only.
+`serve` and `dev-token` need `EVAL_HARNESS_JWT_SECRET` (at least 32 bytes). `dev-token` is refused when `EVAL_HARNESS_ENVIRONMENT=production`.
+
+Environment: `EVAL_HARNESS_ENVIRONMENT`, `EVAL_HARNESS_LOG_LEVEL`, `EVAL_HARNESS_ARTIFACT_ROOT`, `EVAL_HARNESS_SECRET_REFS`, `EVAL_HARNESS_JWT_SECRET` (API only; never stored on the resolved config). Secrets are referenced by environment-variable name only.
 
 ## HTTP API
 

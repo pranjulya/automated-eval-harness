@@ -19,6 +19,7 @@ from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
 from .errors import ConfigError
 
 __all__ = [
+    "JWT_SECRET_ENV",
     "AppConfig",
     "Environment",
     "LogLevel",
@@ -34,7 +35,10 @@ _KEYS: Final[dict[str, str]] = {
     "LOG_LEVEL": f"{ENV_PREFIX}LOG_LEVEL",
     "ARTIFACT_ROOT": f"{ENV_PREFIX}ARTIFACT_ROOT",
     "SECRET_REFS": f"{ENV_PREFIX}SECRET_REFS",
+    # Read only by `serve`/`dev-token`; never stored on AppConfig (see service runbook).
+    "JWT_SECRET": f"{ENV_PREFIX}JWT_SECRET",
 }
+JWT_SECRET_ENV: Final = _KEYS["JWT_SECRET"]
 
 
 class Environment(StrEnum):

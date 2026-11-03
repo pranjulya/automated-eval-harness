@@ -7,7 +7,8 @@ at a real OIDC issuer/JWKS.
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from typing import Protocol, runtime_checkable
 
@@ -22,6 +23,7 @@ __all__ = [
     "Principal",
     "Role",
     "TokenVerifier",
+    "issue_hs256_token",
     "require_role",
 ]
 
@@ -103,3 +105,24 @@ def require_role(principal: Principal, *roles: Role) -> None:
             code="FORBIDDEN",
             details={"required": [role.value for role in roles]},
         )
+
+
+def issue_hs256_token(
+    secret: str,
+    *,
+    actor: str,
+    roles: Iterable[Role],
+    tenant: str = "default",
+    ttl: timedelta = timedelta(hours=1),
+    now: datetime | None = None,
+) -> str:
+    """Mint a learning-mode HS256 token that :class:`HmacJwtVerifier` accepts."""
+    issued = now or datetime.now(UTC)
+    claims = {
+        "sub": actor,
+        "roles": sorted(role.value for role in roles),
+        "tenant": tenant,
+        "iat": issued,
+        "exp": issued + ttl,
+    }
+    return jwt.encode(claims, secret, algorithm="HS256")

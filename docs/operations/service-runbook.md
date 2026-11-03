@@ -43,9 +43,10 @@
 - `GET /health/live` — process liveness.
 - `GET /health/ready` — artifact-store reachability (`artifacts: true|false`).
 
-## Not yet available locally
+## Running locally
 
-- The API is code-complete and tested via `TestClient`, but there is **no
-  `eval-harness serve` command and no `uvicorn` dependency** yet, so a local
-  `curl` smoke test is not possible until that is added (Phase 08 follow-up).
-  See `docs/operations/local-quickstart.md`.
+`eval-harness serve --config evaluation/configs/fake.json` boots the API with
+uvicorn over the same services the CLI uses, with `HmacJwtVerifier` and
+`EVAL_HARNESS_JWT_SECRET`. Mint learning-mode tokens with `eval-harness
+dev-token`. Idempotency records and online samples are in memory and reset on
+restart. See `docs/operations/local-quickstart.md`.

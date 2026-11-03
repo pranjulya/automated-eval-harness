@@ -17,3 +17,6 @@ htmlcov/
 # Local environment and artifacts
 .env
 /artifacts/
+
+# Local quickstart approval file
+/approval.json
