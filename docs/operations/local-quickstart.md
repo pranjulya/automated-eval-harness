@@ -12,7 +12,7 @@ or a paid provider.
 ## Steps
 
 ```bash
-cd /Users/pranjulyabajpai/src/genAI/automated-eval-harness
+cd automated-eval-harness   # repository root
 
 # 1. Install locked dependencies into .venv
 uv sync --extra dev --frozen
