@@ -491,29 +491,43 @@ def _budgets(
                     absolute_ms=policy.latency_absolute_p95_ms,
                 )
             )
-        if baseline_p95:
-            latency_delta = (candidate_p95 - baseline_p95) / baseline_p95
-            if candidate_p95 > baseline_p95 * policy.latency_relative_margin:
+        if baseline_p95 is not None:
+            # A 0 ms baseline is a real measurement. `if baseline_p95` would skip
+            # the relative check (and avoid a divide-by-zero), letting any
+            # candidate under the absolute SLO pass. Compare against zero
+            # without dividing.
+            if baseline_p95 > 0:
+                latency_delta = (candidate_p95 - baseline_p95) / baseline_p95
+                over_margin = candidate_p95 > baseline_p95 * policy.latency_relative_margin
+            else:
+                over_margin = candidate_p95 > 0
+            if over_margin:
+                kwargs = {"delta_pct": latency_delta} if latency_delta is not None else {}
                 reasons.append(
                     _reason(
                         ReasonCode.BUDGET_LATENCY,
                         GateDecision.REVIEW_REQUIRED,
                         "candidate p95 exceeds the relative margin",
-                        delta_pct=latency_delta,
+                        **kwargs,
                     )
                 )
 
     candidate_cost = candidate.summary.total_cost_usd
     baseline_cost = baseline.summary.total_cost_usd
-    if candidate_cost is not None and baseline_cost:
-        cost_delta = (candidate_cost - baseline_cost) / baseline_cost
-        if candidate_cost > baseline_cost * policy.cost_relative_margin:
+    if candidate_cost is not None and baseline_cost is not None:
+        if baseline_cost > 0:
+            cost_delta = (candidate_cost - baseline_cost) / baseline_cost
+            over_margin = candidate_cost > baseline_cost * policy.cost_relative_margin
+        else:
+            over_margin = candidate_cost > 0
+        if over_margin:
+            kwargs = {"delta_pct": cost_delta} if cost_delta is not None else {}
             reasons.append(
                 _reason(
                     ReasonCode.BUDGET_COST,
                     GateDecision.REVIEW_REQUIRED,
                     "candidate cost exceeds the relative margin",
-                    delta_pct=cost_delta,
+                    **kwargs,
                 )
             )
     return latency_delta, cost_delta
