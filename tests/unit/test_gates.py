@@ -216,6 +216,40 @@ def test_cost_budget_review() -> None:
     assert comparison.decision is GateDecision.REVIEW_REQUIRED
 
 
+def test_zero_baseline_latency_still_enforces_relative_margin() -> None:
+    """A 0 ms baseline must not skip the relative latency gate (baseline * 1.15)."""
+    baseline = make_run("base", p95=0.0)
+    candidate = make_run("cand", p95=1000.0)
+    comparison = compare_runs(candidate, baseline, GatePolicy())
+    assert ReasonCode.BUDGET_LATENCY.value in codes(comparison)
+    assert comparison.decision is GateDecision.REVIEW_REQUIRED
+
+
+def test_zero_baseline_and_candidate_latency_passes_relative_margin() -> None:
+    baseline = make_run("base", p95=0.0)
+    candidate = make_run("cand", p95=0.0)
+    comparison = compare_runs(candidate, baseline, GatePolicy())
+    assert ReasonCode.BUDGET_LATENCY.value not in codes(comparison)
+    assert comparison.decision is GateDecision.PASS
+
+
+def test_zero_baseline_cost_still_enforces_relative_margin() -> None:
+    """A $0 baseline must not skip the relative cost gate (baseline * 1.10)."""
+    baseline = make_run("base", cost=0.0)
+    candidate = make_run("cand", cost=1.0)
+    comparison = compare_runs(candidate, baseline, GatePolicy())
+    assert ReasonCode.BUDGET_COST.value in codes(comparison)
+    assert comparison.decision is GateDecision.REVIEW_REQUIRED
+
+
+def test_zero_baseline_and_candidate_cost_passes_relative_margin() -> None:
+    baseline = make_run("base", cost=0.0)
+    candidate = make_run("cand", cost=0.0)
+    comparison = compare_runs(candidate, baseline, GatePolicy())
+    assert ReasonCode.BUDGET_COST.value not in codes(comparison)
+    assert comparison.decision is GateDecision.PASS
+
+
 def test_block_takes_precedence_over_review() -> None:
     baseline = make_run("base", p95=1000.0, cost=1.0)
     candidate = make_run("cand", failing={"text-005"}, p95=2000.0, cost=1.5)
